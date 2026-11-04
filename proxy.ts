@@ -46,7 +46,7 @@ export async function proxy(request: NextRequest) {
 
   // 1. Belum login tapi membuka halaman yang butuh login
   if (!user && LOGIN_REQUIRED.some((p) => matches(path, p))) {
-    return redirectTo(request, supabaseResponse, "/login", `?next=${encodeURIComponent(path)}`);
+    return redirectTo(request, supabaseResponse, "/login", `?next=${encodeURIComponent(path + request.nextUrl.search)}`);
   }
 
   // 2. Sudah login tapi membuka halaman login/daftar
