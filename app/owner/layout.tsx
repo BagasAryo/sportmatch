@@ -16,6 +16,9 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
             <Link href="/owner" className="text-sm text-slate-700 hover:text-brand-600">
               Venue saya
             </Link>
+            <Link href="/owner/bookings" className="text-sm text-slate-700 hover:text-brand-600">
+              Booking masuk
+            </Link>
           </nav>
           <div className="flex items-center gap-3 text-sm">
             <span className="text-slate-600">{profile?.full_name}</span>
