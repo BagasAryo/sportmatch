@@ -51,6 +51,7 @@ export default function PaymentActions({ bookingId, userId, status, total }: { b
     if (dbErr) return setError(dbErr.message);
 
     setFile(null);
+    router.push('/bookings');
     router.refresh();
   }
 
@@ -60,6 +61,7 @@ export default function PaymentActions({ bookingId, userId, status, total }: { b
     const { error: dbErr } = await supabase.from("bookings").update({ status: "dibatalkan" }).eq("id", bookingId);
     setBusy(false);
     if (dbErr) return setError(dbErr.message);
+    router.push('/bookings');
     router.refresh();
   }
 

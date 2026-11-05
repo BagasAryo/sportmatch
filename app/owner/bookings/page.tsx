@@ -12,7 +12,7 @@ export default async function OwnerBookingsPage() {
   // courts!inner dan venues!inner: hanya booking di venue milik akun ini
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("id, booking_date, start_time, end_time, subtotal, service_fee, total_price, status, payment_proof_path, rejection_note, created_at, profiles(full_name, phone), courts!inner(name, venues!inner(name, owner_id))")
+    .select("id, booking_date, start_time, end_time, subtotal, service_fee, total_price, status, payment_proof_path, rejection_note, created_at, profiles(full_name, phone), courts!inner(name, sport_types(name), venues!inner(name, owner_id))")
     .eq("courts.venues.owner_id", profile!.id)
     .order("created_at", { ascending: false });
 
@@ -29,7 +29,7 @@ export default async function OwnerBookingsPage() {
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
             <p className="font-semibold text-slate-800">
-              {venue?.name} &middot; {court?.name}
+              {venue?.name} &middot; {court?.name} ({first(court?.sport_types)?.name})
             </p>
             <p className="text-sm text-slate-600">
               Pemesan: {booker?.full_name || "-"}

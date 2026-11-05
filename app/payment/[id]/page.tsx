@@ -15,7 +15,7 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
 
   const { data: booking } = await supabase
     .from("bookings")
-    .select("id, user_id, booking_date, start_time, end_time, subtotal, service_fee, total_price, status, rejection_note, courts(name, venues(id, name, qris_image_url))")
+    .select("id, user_id, booking_date, start_time, end_time, subtotal, service_fee, total_price, status, rejection_note, courts(name, sport_types(name), venues(id, name, qris_image_url))")
     .eq("id", id)
     .single();
 
@@ -24,12 +24,14 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
   const court = first(booking.courts);
   const venue = first(court?.venues);
 
+  const pending = booking.status=== 'menunggu_verifikasi' || booking.status === 'menunggu_bayar';
+
   return (
     <div className="min-h-screen bg-slate-50">
       <SiteHeader />
       <main className="mx-auto max-w-4xl px-4 py-8">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold text-slate-800">Pembayaran</h1>
+          <h1 className="text-2xl font-bold text-slate-800">{pending ? "Pembayaran" : "Detail Booking"}</h1>
           <StatusBadge status={booking.status} />
         </div>
 
@@ -40,10 +42,10 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
         {booking.status === "ditolak" && (
           <p className="mt-4 rounded bg-red-50 px-4 py-3 text-sm text-red-800">
             Bukti pembayaran ditolak
-            {booking.rejection_note ? `: ${booking.rejection_note}` : "."} Slot sudah dilepaskan, silakan buat booking baru.
+            {booking.rejection_note ? `: ${booking.rejection_note}` : "."}
           </p>
         )}
-        {booking.status === "dibatalkan" && <p className="mt-4 rounded bg-slate-100 px-4 py-3 text-sm text-slate-700">Booking ini dibatalkan dan slotnya sudah dilepaskan.</p>}
+        {booking.status === "dibatalkan" && <p className="mt-4 rounded bg-slate-100 px-4 py-3 text-sm text-slate-700">Booking ini dibatalkan</p>}
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <section className="rounded-lg border bg-white p-5">
@@ -52,7 +54,7 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-slate-600">Lapangan</dt>
-                <dd className="font-medium">{court?.name}</dd>
+                <dd className="font-medium">{court?.name} ({first(court?.sport_types)?.name})</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-slate-600">Tanggal</dt>

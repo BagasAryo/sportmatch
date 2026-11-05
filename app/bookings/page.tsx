@@ -12,7 +12,7 @@ export default async function MyBookingsPage() {
 
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("id, booking_date, start_time, end_time, total_price, status, rejection_note, created_at, courts(name, venues(name))")
+    .select("id, booking_date, start_time, end_time, total_price, status, rejection_note, created_at, courts(name, sport_types(name), venues(name))")
     .eq("user_id", profile!.id)
     .order("created_at", { ascending: false });
 
@@ -40,7 +40,9 @@ export default async function MyBookingsPage() {
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <p className="font-semibold text-slate-800">{venue?.name}</p>
-                      <p className="text-sm text-slate-600">{court?.name}</p>
+                      <p className="text-sm text-slate-600">
+                        {court?.name} &middot; {first(court?.sport_types)?.name}
+                      </p>
                     </div>
                     <StatusBadge status={b.status} />
                   </div>
@@ -49,11 +51,14 @@ export default async function MyBookingsPage() {
                   </p>
                   <p className="text-sm font-medium text-brand-700">{rupiah(b.total_price)}</p>
                   {b.status === "ditolak" && b.rejection_note && <p className="mt-2 rounded bg-red-50 px-3 py-1.5 text-sm text-red-800">Alasan penolakan: {b.rejection_note}</p>}
-                  {needsAction && (
-                    <Link href={`/payment/${b.id}`} className="mt-3 inline-block rounded bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-600">
-                      {b.status === "menunggu_bayar" ? "Lanjutkan pembayaran" : "Lihat status"}
+                  
+                    <Link
+                      href={`/payment/${b.id}`}
+                      className={needsAction ? "mt-3 inline-block rounded bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-600" : "mt-3 inline-block rounded border px-4 py-1.5 text-sm hover:bg-slate-100"}
+                    >
+                      {b.status === "menunggu_bayar" ? "Lanjutkan pembayaran" : b.status === "menunggu_verifikasi" ? "Lihat status" : "Lihat detail"}
                     </Link>
-                  )}
+                  
                 </li>
               );
             })}
