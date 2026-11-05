@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { logout } from "@/app/login/actions";
 import { getCurrentProfile } from "@/lib/auth";
+import NotificationBellLoader from "@/components/notification-bell-loader";
 
 export default async function OwnerLayout({ children }: { children: React.ReactNode }) {
   const profile = await getCurrentProfile();
@@ -21,6 +22,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
             </Link>
           </nav>
           <div className="flex items-center gap-3 text-sm">
+            {profile && <NotificationBellLoader userId={profile.id} />}
             <span className="text-slate-600">{profile?.full_name}</span>
             <form action={logout}>
               <button className="rounded border px-3 py-1 hover:bg-slate-100">Keluar</button>

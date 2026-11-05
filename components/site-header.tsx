@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth";
 import { logout } from "@/app/login/actions";
+import NotificationBellLoader from "@/components/notification-bell-loader";
 
 export default async function SiteHeader() {
   const profile = await getCurrentProfile();
@@ -20,6 +21,7 @@ export default async function SiteHeader() {
               <Link href={dashHref} className="text-slate-700 hover:text-brand-600">
                 {dashLabel}
               </Link>
+              <NotificationBellLoader userId={profile.id} />
               <span className="hidden text-slate-500 sm:inline">{profile.full_name}</span>
               <form action={logout}>
                 <button className="rounded border px-3 py-1 hover:bg-slate-100">Keluar</button>
