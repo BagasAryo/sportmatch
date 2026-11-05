@@ -7,6 +7,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import { first } from "@/lib/utils";
 import { formatDateID, rupiah } from "@/lib/format";
 import PaymentActions from "./payment-actions";
+import ReviewForm from "@/components/review-form";
 
 export default async function PaymentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,7 +25,11 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
   const court = first(booking.courts);
   const venue = first(court?.venues);
 
-  const pending = booking.status=== 'menunggu_verifikasi' || booking.status === 'menunggu_bayar';
+  const { data: review } = await supabase.from("reviews").select("rating, comment, created_at").eq("booking_id", booking.id).maybeSingle();
+
+  const ended = new Date(`${booking.booking_date}T${booking.end_time}+07:00`).getTime() < Date.now();
+
+  const pending = booking.status === "menunggu_verifikasi" || booking.status === "menunggu_bayar";
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -54,7 +59,9 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-slate-600">Lapangan</dt>
-                <dd className="font-medium">{court?.name} ({first(court?.sport_types)?.name})</dd>
+                <dd className="font-medium">
+                  {court?.name} ({first(court?.sport_types)?.name})
+                </dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-slate-600">Tanggal</dt>
@@ -110,6 +117,29 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
             </section>
           )}
         </div>
+        {booking.status === "dikonfirmasi" && (
+          <section className="mt-6 rounded-lg border bg-white p-5">
+            {" "}
+            <h2 className="font-semibold text-slate-800">Ulasan</h2>{" "}
+            {review ? (
+              <div className="mt-2">
+                {" "}
+                <p className="text-lg font-medium text-accent-500">
+                  {" "}
+                  {"★".repeat(review.rating)} <span className="text-slate-300">{"★".repeat(5 - review.rating)}</span>{" "}
+                </p>{" "}
+                {review.comment && <p className="mt-1 text-sm text-slate-700">{review.comment}</p>} <p className="mt-1 text-xs text-slate-500"> Terima kasih, ulasanmu sudah tampil di halaman venue. </p>{" "}
+              </div>
+            ) : ended ? (
+              <div className="mt-3">
+                {" "}
+                <ReviewForm bookingId={booking.id} />{" "}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-slate-600"> Kamu bisa memberi ulasan setelah waktu booking selesai. </p>
+            )}{" "}
+          </section>
+        )}
       </main>
     </div>
   );
