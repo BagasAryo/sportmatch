@@ -1,8 +1,8 @@
-import Link from "next/link";
 import SiteHeader from "@/components/site-header";
 import SearchForm from "@/components/search-form";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateID, rupiah, todayWIB } from "@/lib/format";
+import { formatDateID, todayWIB } from "@/lib/format";
+import SearchResults from "@/components/search-results";
 
 type Result = {
   venue_id: string;
@@ -86,35 +86,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
         {validShape && !message && results.length === 0 && <p className="mt-6 rounded border border-dashed bg-white p-8 text-center text-slate-500">Belum ada venue yang kosong pada waktu itu. Coba ubah jam, tanggal, atau kecamatan.</p>}
 
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-          {results.map((r) => (
-            <li key={r.venue_id} className="overflow-hidden rounded-lg border bg-white">
-              <Link href={`/venues/${r.venue_id}?${detailQuery}`}>
-                {r.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={r.photo_url} alt={r.venue_name} className="h-44 w-full object-cover" />
-                ) : (
-                  <div className="flex h-44 items-center justify-center bg-brand-50 text-sm text-brand-700">Belum ada foto</div>
-                )}
-                <div className="space-y-1.5 p-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-semibold text-slate-800">{r.venue_name}</h2>
-                    {r.is_promoted && <span className="rounded bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">Promoted</span>}
-                  </div>
-                  <p className="text-sm text-slate-600">
-                    {r.district_name} &middot; {r.address}
-                  </p>
-                  <p className="text-sm text-slate-600">{r.avg_rating ? `★ ${r.avg_rating} (${r.review_count} ulasan)` : "Belum ada ulasan"}</p>
-                  <p className="text-sm">
-                    <span className="font-semibold text-brand-700">Mulai {rupiah(r.min_price)}</span>
-                    <span className="text-slate-500"> / jam</span>
-                    <span className="text-slate-500"> &middot; {r.available_courts} lapangan {sportName} kosong</span>
-                  </p>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <SearchResults results={results} detailQuery={detailQuery} compareQuery={`date=${date}&start=${start}&end=${end}&sport=${sport}`} />
       </main>
     </div>
   );
