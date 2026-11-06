@@ -37,46 +37,54 @@ export default function SearchResults({ results, detailQuery, compareQuery }: { 
 
   return (
     <>
-      <ul className="mt-6 grid gap-4 sm:grid-cols-2 grid-cols-2">
+      {/* 1. Atur Grid: Mobile 2 kolom, Tablet & Desktop 3 kolom */}
+      <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-4">
         {results.map((r) => {
           const checked = selected.includes(r.venue_id);
           return (
-            <li key={r.venue_id} className={`overflow-hidden rounded-lg border bg-white ${checked ? "border-brand-600 ring-1 ring-brand-600" : ""}`}>
-              <Link href={`/venues/${r.venue_id}?${detailQuery}`}>
-                {r.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={r.photo_url} alt={r.venue_name} className="h-44 w-full object-cover" />
-                ) : (
-                  <div className="flex h-44 items-center justify-center bg-brand-50 text-sm text-brand-700">Belum ada foto</div>
-                )}
-                <div className="space-y-1.5 p-4 pb-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-semibold text-slate-800">{r.venue_name}</h2>
-                    {r.is_promoted && <span className="rounded bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">Promoted</span>}
-                  </div>
-                  <p className="text-sm text-slate-600">
+            <li key={r.venue_id} className={`flex flex-col overflow-hidden rounded-lg border bg-white transition hover:shadow-sm ${checked ? "border-brand-600 ring-1 ring-brand-600" : ""}`}>
+              <Link href={`/venues/${r.venue_id}?${detailQuery}`} className="flex-1">
+                {/* 2. Bingkai Foto: Menggunakan aspect-[4/3] agar gambar tampil lebih luas */}
+                <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-100">
+                  {r.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={r.photo_url} alt={r.venue_name} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-brand-50 text-xs text-brand-700">Belum ada foto</div>
+                  )}
+
+                  {/* Badge Promoted di kanan atas foto */}
+                  {r.is_promoted && <span className="absolute top-2 right-2 rounded-md bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-accent-600 shadow-sm">Promoted</span>}
+                </div>
+
+                {/* 3. Info Bawah: Lebih padat (p-3), ringkas, dan rapi */}
+                <div className="space-y-1 p-3">
+                  <h2 className="truncate text-sm font-semibold text-slate-800 sm:text-base">{r.venue_name}</h2>
+
+                  <p className="truncate text-xs text-slate-500">
                     {r.district_name} &middot; {r.address}
                   </p>
-                  <p className="text-sm text-slate-600">
+
+                  <p className="text-xs text-slate-600">
                     {r.avg_rating ? (
                       <>
-                        <span className="text-yellow-400">★</span> {r.avg_rating} ({r.review_count} ulasan)
+                        <span className="text-yellow-400">★</span> {r.avg_rating} <span className="text-slate-400">({r.review_count})</span>
                       </>
                     ) : (
-                      "Belum ada ulasan"
+                      <span className="text-slate-400">Belum ada ulasan</span>
                     )}
                   </p>
-                  <p className="text-sm">
-                    <span className="font-semibold text-brand-700">Mulai {rupiah(r.min_price)}</span>
-                    <span className="text-slate-500"> / jam</span>
-                    <span className="text-slate-500"> &middot; {r.available_courts} lapangan kosong</span>
-                  </p>
+
+                  <p className="pt-0.5 text-xs sm:text-sm font-bold text-brand-700">Mulai {rupiah(r.min_price)}</p>
                 </div>
               </Link>
-              <label className="flex cursor-pointer items-center gap-2 border-t px-4 py-2 text-sm text-slate-700">
-                <input type="checkbox" checked={checked} onChange={() => toggle(r.venue_id)} />
-                Bandingkan
-              </label>
+
+              {/* Tombol Bandingkan */}
+              <div className="border-t p-2.5">
+                <button type="button" onClick={() => toggle(r.venue_id)} className={`w-full rounded px-2.5 py-1 text-xs font-medium transition ${checked ? "bg-brand-700 text-white" : "border text-slate-700 hover:bg-slate-100"}`}>
+                  {checked ? "✓ Dipilih" : "+ Bandingkan"}
+                </button>
+              </div>
             </li>
           );
         })}
