@@ -39,5 +39,5 @@ export async function createBooking(formData: FormData) {
     redirect(`/checkout?${q.toString()}`);
   }
 
-  redirect(`/payment/${data.id}`);
+  redirect(`/bookings/${data.id}`);
 }

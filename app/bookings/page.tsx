@@ -53,7 +53,7 @@ export default async function MyBookingsPage() {
                   {b.status === "ditolak" && b.rejection_note && <p className="mt-2 rounded bg-red-50 px-3 py-1.5 text-sm text-red-800">Alasan penolakan: {b.rejection_note}</p>}
                   
                     <Link
-                      href={`/payment/${b.id}`}
+                      href={`/bookings/${b.id}`}
                       className={needsAction ? "mt-3 inline-block rounded bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-600" : "mt-3 inline-block rounded border px-4 py-1.5 text-sm hover:bg-slate-100"}
                     >
                       {b.status === "menunggu_bayar" ? "Lanjutkan pembayaran" : b.status === "menunggu_verifikasi" ? "Lihat status" : "Lihat detail"}

@@ -4,11 +4,28 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { rupiah } from "@/lib/format";
+import { useCountdown } from "./use-countdown";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
 
-export default function PaymentActions({ bookingId, userId, status, total }: { bookingId: string; userId: string; status: string; total: number }) {
+export default function PaymentActions({
+  bookingId,
+  userId,
+  status,
+  total,
+  deadline,
+  serverNow,
+}: {
+  bookingId: string;
+  userId: string;
+  status: string;
+  total: number;
+  // batas bayar (ms sejak epoch); null jika booking tidak sedang menunggu pembayaran
+  deadline: number | null;
+  // waktu server saat halaman dibuat (ms), untuk menyamakan jam server dan jam perangkat
+  serverNow: number;
+}) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -16,6 +33,11 @@ export default function PaymentActions({ bookingId, userId, status, total }: { b
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+
+  // Hitung mundur ditampilkan di atas halaman (PaymentCountdown); di sini hanya
+  // dipakai untuk menonaktifkan tombol kirim setelah waktu habis
+  const remaining = useCountdown(deadline, serverNow);
+  const expired = status === "menunggu_bayar" && remaining !== null && remaining <= 0;
 
   const canPay = status === "menunggu_bayar" || status === "menunggu_verifikasi";
   if (!canPay) return null;
@@ -33,6 +55,7 @@ export default function PaymentActions({ bookingId, userId, status, total }: { b
   async function handleUpload(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    if (expired) return setError("Waktu pembayaran sudah habis");
     if (!file) return setError("Pilih gambar bukti pembayaran terlebih dahulu");
     if (!ALLOWED_TYPES.includes(file.type)) return setError("Format harus JPG, PNG, atau WebP");
     if (file.size > MAX_SIZE) return setError("Ukuran gambar maksimal 2 MB");
@@ -51,7 +74,7 @@ export default function PaymentActions({ bookingId, userId, status, total }: { b
     if (dbErr) return setError(dbErr.message);
 
     setFile(null);
-    router.push('/bookings');
+    router.push("/bookings");
     router.refresh();
   }
 
@@ -61,7 +84,7 @@ export default function PaymentActions({ bookingId, userId, status, total }: { b
     const { error: dbErr } = await supabase.from("bookings").update({ status: "dibatalkan" }).eq("id", bookingId);
     setBusy(false);
     if (dbErr) return setError(dbErr.message);
-    router.push('/bookings');
+    router.push("/bookings");
     router.refresh();
   }
 
@@ -82,7 +105,7 @@ export default function PaymentActions({ bookingId, userId, status, total }: { b
         <label className="block text-sm font-medium">{status === "menunggu_bayar" ? "Unggah bukti pembayaran" : "Ganti bukti pembayaran (opsional)"}</label>
         <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block text-sm" />
         <p className="text-xs text-slate-500">Screenshot bukti transfer, JPG, PNG, atau WebP, maksimal 2 MB.</p>
-        <button disabled={busy} className="rounded bg-brand-600 px-5 py-2 text-white hover:bg-brand-700 disabled:opacity-60">
+        <button disabled={busy || expired} className="rounded bg-brand-600 px-5 py-2 text-white hover:bg-brand-700 disabled:opacity-60">
           {busy ? "Memproses..." : "Kirim bukti pembayaran"}
         </button>
       </form>
