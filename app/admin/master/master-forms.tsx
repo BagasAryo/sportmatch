@@ -35,62 +35,6 @@ function Feedback({ error, ok }: { error: string; ok: string }) {
   );
 }
 
-export function AddCityForm() {
-  const supabase = createClient();
-  const [name, setName] = useState("");
-  const { busy, error, ok, run } = useSubmit();
-
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        await run(() => supabase.from("cities").insert({ name: name.trim() }), "Kota ditambahkan");
-        setName("");
-      }}
-    >
-      <div className="flex gap-2">
-        <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama kota baru" className={inputClass} />
-        <button disabled={busy} className={buttonClass}>
-          Tambah
-        </button>
-      </div>
-      <Feedback error={error} ok={ok} />
-    </form>
-  );
-}
-
-export function AddDistrictForm({ cities }: { cities: { id: string; name: string }[] }) {
-  const supabase = createClient();
-  const [cityId, setCityId] = useState(cities[0]?.id ?? "");
-  const [name, setName] = useState("");
-  const { busy, error, ok, run } = useSubmit();
-
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        await run(() => supabase.from("districts").insert({ city_id: cityId, name: name.trim() }), "Kecamatan ditambahkan");
-        setName("");
-      }}
-    >
-      <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-        <select required value={cityId} onChange={(e) => setCityId(e.target.value)} className={inputClass}>
-          {cities.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama kecamatan baru" className={inputClass} />
-        <button disabled={busy} className={buttonClass}>
-          Tambah
-        </button>
-      </div>
-      <Feedback error={error} ok={ok} />
-    </form>
-  );
-}
-
 export function AddSportForm() {
   const supabase = createClient();
   const [name, setName] = useState("");

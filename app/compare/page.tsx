@@ -33,7 +33,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   const supabase = await createClient();
 
   const [{ data: venues }, { data: courts }, { data: ratings }] = await Promise.all([
-    supabase.from("venues").select("id, name, address, photo_urls, facilities, is_promoted, qris_image_url, districts(name, cities(name))").in("id", idList),
+    supabase.from("venues").select("id, name, address, photo_urls, facilities, is_promoted, qris_image_url").in("id", idList),
     supabase.from("courts").select("venue_id, price_per_hour, open_time, close_time, sport_types(name)").in("venue_id", idList).eq("is_active", true),
     supabase.from("venue_ratings").select("venue_id, avg_rating, review_count").in("venue_id", idList),
   ]);
@@ -53,13 +53,11 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
       const prices = vc.map((c) => c.price_per_hour as number);
       const sports = Array.from(new Set(vc.map((c) => first(c.sport_types)?.name).filter(Boolean))) as string[];
       const rating = (ratings ?? []).find((r) => r.venue_id === v.id);
-      const district = first(v.districts);
       return {
         id: v.id,
         name: v.name,
         isPromoted: v.is_promoted as boolean,
         photo: (v.photo_urls as string[] | null)?.[0] ?? null,
-        location: `${district?.name ?? ""}${first(district?.cities)?.name ? `, ${first(district?.cities)?.name}` : ""}`,
         address: v.address as string,
         minPrice: prices.length ? Math.min(...prices) : 0,
         maxPrice: prices.length ? Math.max(...prices) : 0,
@@ -89,7 +87,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
         <p className="mt-1 text-sm text-slate-600">Nilai terbaik pada harga dan rating ditandai hijau.</p>
 
         <div className="mt-5 overflow-x-auto rounded-lg border bg-white">
-          <table className="w-full min-w-[640px] text-sm">
+          <table className="w-full min-w-160 text-sm">
             <thead>
               <tr className="border-b bg-slate-50 text-left">
                 <th className="w-36 p-3 font-medium text-slate-600"></th>
@@ -109,11 +107,10 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
             </thead>
             <tbody className="divide-y">
               <tr>
-                <td className="p-3 text-slate-600">Lokasi</td>
+                <td className="p-3 text-slate-600">Alamat</td>
                 {rows.map((r) => (
                   <td key={r.id} className="p-3">
-                    <p>{r.location}</p>
-                    <p className="text-xs text-slate-500">{r.address}</p>
+                    {r.address}
                   </td>
                 ))}
               </tr>

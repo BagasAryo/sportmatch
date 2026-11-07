@@ -6,7 +6,7 @@ import VenueToggles from "./venue-toggles";
 export default async function AdminVenuesPage() {
   const supabase = await createClient();
 
-  const { data: venues } = await supabase.from("venues").select("id, name, address, is_active, is_promoted, qris_image_url, created_at, profiles(full_name), districts(name), courts(id)").order("created_at", { ascending: false });
+  const { data: venues } = await supabase.from("venues").select("id, name, address, is_active, is_promoted, qris_image_url, created_at, profiles(full_name), courts(id)").order("created_at", { ascending: false });
 
   return (
     <div className="max-w-3xl">
@@ -28,7 +28,7 @@ export default async function AdminVenuesPage() {
                   {!v.is_active && <span className="rounded bg-slate-200 px-2 py-0.5 text-xs">Nonaktif</span>}
                 </div>
                 <p className="text-sm text-slate-600">
-                  {first(v.districts)?.name} &middot; Pemilik: {first(v.profiles)?.full_name || "-"} &middot; {v.courts?.length ?? 0} lapangan
+                  Pemilik: {first(v.profiles)?.full_name || "-"} &middot; {v.courts?.length ?? 0} lapangan
                 </p>
                 {!v.qris_image_url && <p className="text-xs text-amber-700">QRIS belum diunggah</p>}
               </div>

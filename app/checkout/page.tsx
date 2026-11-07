@@ -32,11 +32,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
   const supabase = await createClient();
 
-  const { data: courtRow } = await supabase
-    .from("courts")
-    .select("id, name, open_time, close_time, price_per_hour, is_active, sport_types(name), venues(id, name, address, is_active, qris_image_url, districts(name))")
-    .eq("id", court!)
-    .single();
+  const { data: courtRow } = await supabase.from("courts").select("id, name, open_time, close_time, price_per_hour, is_active, sport_types(name), venues(id, name, address, is_active, qris_image_url)").eq("id", court!).single();
 
   const venue = first(courtRow?.venues);
   if (!courtRow || !courtRow.is_active || !venue || !venue.is_active) {
@@ -72,9 +68,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
         <div className="mt-5 rounded-lg border bg-white p-5">
           <h2 className="font-semibold text-slate-800">{venue.name}</h2>
-          <p className="text-sm text-slate-600">
-            {first(venue.districts)?.name} &middot; {venue.address}
-          </p>
+          <p className="text-sm text-slate-600">{venue.address}</p>
 
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">

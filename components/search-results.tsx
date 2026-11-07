@@ -61,9 +61,7 @@ export default function SearchResults({ results, detailQuery, compareQuery }: { 
                 <div className="space-y-1 p-3">
                   <h2 className="truncate text-sm font-semibold text-slate-800 sm:text-base">{r.venue_name}</h2>
 
-                  <p className="truncate text-xs text-slate-500">
-                    {r.district_name} &middot; {r.address}
-                  </p>
+                  <p className="truncate text-xs text-slate-500">{r.address}</p>
 
                   <p className="text-xs text-slate-600">
                     {r.avg_rating ? (

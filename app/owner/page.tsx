@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
-import { first } from "@/lib/utils";
 
 export default async function OwnerHome() {
   const supabase = await createClient();
   const profile = await getCurrentProfile();
 
-  const { data: venues } = await supabase.from("venues").select("id, name, address, is_active, is_promoted, qris_image_url, photo_urls, districts(name), courts(id)").eq("owner_id", profile!.id).order("created_at", { ascending: false });
+  const { data: venues } = await supabase.from("venues").select("id, name, address, is_active, is_promoted, qris_image_url, photo_urls, courts(id)").eq("owner_id", profile!.id).order("created_at", { ascending: false });
 
   return (
     <div>
@@ -34,16 +33,8 @@ export default async function OwnerHome() {
                 )}
 
                 <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
-                  {v.is_promoted && (
-                    <span className="rounded-md bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-accent-600 shadow-sm">
-                      Promoted
-                    </span>
-                  )}
-                  {!v.is_active && (
-                    <span className="rounded-md bg-slate-800/80 px-2 py-0.5 text-[11px] font-medium text-white shadow-sm backdrop-blur-xs">
-                      Nonaktif
-                    </span>
-                  )}
+                  {v.is_promoted && <span className="rounded-md bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-accent-600 shadow-sm">Promoted</span>}
+                  {!v.is_active && <span className="rounded-md bg-slate-800/80 px-2 py-0.5 text-[11px] font-medium text-white shadow-sm backdrop-blur-xs">Nonaktif</span>}
                 </div>
               </div>
 
@@ -51,23 +42,11 @@ export default async function OwnerHome() {
               <div className="flex flex-1 flex-col justify-between p-3">
                 <div className="space-y-1">
                   <h2 className="truncate text-sm font-semibold text-slate-800 sm:text-base">{v.name}</h2>
-                  <p className="truncate text-xs text-slate-500">
-                    {first(v.districts)?.name} &middot; {v.address}
-                  </p>
-                  <p className="text-xs font-medium text-slate-600">
-                    {v.courts?.length ?? 0} lapangan
-                  </p>
+                  <p className="truncate text-xs text-slate-500">{v.address}</p>
+                  <p className="text-xs font-medium text-slate-600">{v.courts?.length ?? 0} lapangan</p>
 
-                  {!v.qris_image_url && (
-                    <p className="mt-1 rounded bg-amber-50 px-2 py-1 text-[11px] text-amber-800">
-                      QRIS belum diunggah. Venue belum bisa dibooking.
-                    </p>
-                  )}
-                  {(v.courts?.length ?? 0) === 0 && (
-                    <p className="mt-1 rounded bg-amber-50 px-2 py-1 text-[11px] text-amber-800">
-                      Belum ada lapangan.
-                    </p>
-                  )}
+                  {!v.qris_image_url && <p className="mt-1 rounded bg-amber-50 px-2 py-1 text-[11px] text-amber-800">QRIS belum diunggah. Venue belum bisa dibooking.</p>}
+                  {(v.courts?.length ?? 0) === 0 && <p className="mt-1 rounded bg-amber-50 px-2 py-1 text-[11px] text-amber-800">Belum ada lapangan.</p>}
                 </div>
 
                 <div className="mt-3 flex gap-3 border-t pt-2 text-xs font-medium">

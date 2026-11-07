@@ -3,13 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { first } from "@/lib/utils";
-
-export type District = {
-  id: string;
-  name: string;
-  cities: { name: string } | {name: string}[] | null;
-};
 
 export type VenueData = {
   id: string;
@@ -37,14 +30,15 @@ function validateImage(file: File): string | null {
   return null;
 }
 
-export default function VenueForm({ ownerId, districts, venue }: { ownerId: string; districts: District[]; venue?: VenueData }) {
+export default function VenueForm({ ownerId, defaultDistrictId, venue }: { ownerId: string; defaultDistrictId?: string; venue?: VenueData }) {
   const router = useRouter();
   const supabase = createClient();
 
   const [name, setName] = useState(venue?.name ?? "");
   const [address, setAddress] = useState(venue?.address ?? "");
   const [description, setDescription] = useState(venue?.description ?? "");
-  const [districtId, setDistrictId] = useState(venue?.district_id ?? "");
+  // Semua venue berada di Gunungpati: venue baru memakai kecamatan bawaan, venue lama tetap
+  const districtId = venue?.district_id ?? defaultDistrictId ?? "";
   const [facilities, setFacilities] = useState((venue?.facilities ?? []).join(", "));
   const [mapsUrl, setMapsUrl] = useState(venue?.maps_url ?? "");
   const [isActive, setIsActive] = useState(venue?.is_active ?? true);
@@ -71,7 +65,7 @@ export default function VenueForm({ ownerId, districts, venue }: { ownerId: stri
     setError("");
 
     if (!districtId) {
-      setError("Pilih kecamatan terlebih dahulu");
+      setError("Kecamatan Gunungpati belum ada di data master. Hubungi admin.");
       return;
     }
     const filesToCheck = [...newPhotos, ...(newQris ? [newQris] : [])];
@@ -135,19 +129,6 @@ export default function VenueForm({ ownerId, districts, venue }: { ownerId: stri
       <div>
         <label className="block text-sm font-medium">Nama venue</label>
         <input required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Kecamatan</label>
-        <select required value={districtId} onChange={(e) => setDistrictId(e.target.value)} className={inputClass}>
-          <option value="">Pilih kecamatan</option>
-          {districts.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-              {first(d.cities)?.name ? ` (${first(d.cities)?.name})` : ""}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div>

@@ -18,14 +18,10 @@ type Result = {
 };
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const { city, district, sport, date, start, end } = await searchParams;
+  const { sport, date, start, end } = await searchParams;
   const supabase = await createClient();
 
-  const [{ data: cities }, { data: districts }, { data: sportTypes }] = await Promise.all([
-    supabase.from("cities").select("id, name").order("name"),
-    supabase.from("districts").select("id, city_id, name").order("name"),
-    supabase.from("sport_types").select("id, name").order("name"),
-  ]);
+  const { data: sportTypes } = await supabase.from("sport_types").select("id, name").order("name");
 
   let results: Result[] = [];
   let message = "";
@@ -44,8 +40,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       p_date: date,
       p_start: start,
       p_end: end,
-      p_city_id: city || null,
-      p_district_id: district || null,
     });
     if (error) {
       message = `Pencarian gagal: ${error.message}`;
@@ -55,8 +49,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   }
 
   const sportName = sportTypes?.find((s) => s.id === sport)?.name;
-  const districtName = districts?.find((d) => d.id === district)?.name;
-  const cityName = cities?.find((c) => c.id === city)?.name;
 
   const detailQuery = `date=${date}&start=${start}&end=${end}&sport=${sport}`;
 
@@ -67,15 +59,13 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <details className="mb-6 rounded-lg border bg-white p-4">
           <summary className="cursor-pointer text-sm font-medium text-brand-700">Ubah pencarian</summary>
           <div className="mt-4">
-            <SearchForm cities={cities ?? []} districts={districts ?? []} sportTypes={sportTypes ?? []} initial={{ city, district, sport, date, start, end }} />
+            <SearchForm sportTypes={sportTypes ?? []} initial={{ sport, date, start, end }} />
           </div>
         </details>
 
         {validShape && !message && (
           <>
-            <h1 className="text-2xl font-bold text-slate-800">
-              {sportName} di {districtName ?? `seluruh ${cityName ?? "kota"}`}
-            </h1>
+            <h1 className="text-2xl font-bold text-slate-800">Venue {sportName}</h1>
             <p className="mt-1 text-sm text-slate-600">
               {formatDateID(date!)} &middot; {start} - {end} &middot; {results.length} venue tersedia
             </p>
@@ -84,7 +74,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
         {message && <p className="rounded bg-amber-50 px-4 py-3 text-sm text-amber-800">{message}</p>}
 
-        {validShape && !message && results.length === 0 && <p className="mt-6 rounded border border-dashed bg-white p-8 text-center text-slate-500">Belum ada venue yang kosong pada waktu itu. Coba ubah jam, tanggal, atau kecamatan.</p>}
+        {validShape && !message && results.length === 0 && <p className="mt-6 rounded border border-dashed bg-white p-8 text-center text-slate-500">Belum ada venue yang kosong pada waktu itu. Coba ubah jam atau tanggal.</p>}
 
         <SearchResults results={results} detailQuery={detailQuery} compareQuery={`date=${date}&start=${start}&end=${end}&sport=${sport}`} />
       </main>

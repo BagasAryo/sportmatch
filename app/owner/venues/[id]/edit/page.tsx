@@ -15,12 +15,10 @@ export default async function EditVenuePage({ params }: { params: Promise<{ id: 
     notFound();
   }
 
-  const { data: districts } = await supabase.from("districts").select("id, name, cities(name)").order("name");
-
   return (
     <div className="max-w-2xl">
       <h1 className="mb-4 text-2xl font-bold text-slate-800">Edit venue</h1>
-      <VenueForm ownerId={venue.owner_id} districts={districts ?? []} venue={venue} />
+      <VenueForm ownerId={venue.owner_id} venue={venue} />
     </div>
   );
 }

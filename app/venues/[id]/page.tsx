@@ -10,12 +10,9 @@ export default async function VenueDetailPage({ params, searchParams }: { params
   const { date, start, end, sport } = await searchParams;
   const supabase = await createClient();
 
-  const { data: venue } = await supabase.from("venues").select("*, districts(name, cities(name))").eq("id", id).single();
+  const { data: venue } = await supabase.from("venues").select("*").eq("id", id).single();
 
   if (!venue) notFound();
-
-  const district = first(venue.districts);
-  const cityName = first(district?.cities)?.name;
 
   const { data: courtRows } = await supabase.from("courts").select("id, name, sport_type_id, open_time, close_time, price_per_hour, sport_types(name)").eq("venue_id", id).eq("is_active", true).order("name");
 
@@ -71,10 +68,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
           <h1 className="text-3xl font-bold text-slate-800">{venue.name}</h1>
           {venue.is_promoted && <span className="rounded bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">Promoted</span>}
         </div>
-        <p className="mt-1 text-slate-600">
-          {district?.name}
-          {cityName ? `, ${cityName}` : ""} &middot; {venue.address}
-        </p>
+        <p className="mt-1 text-slate-600">{venue.address}</p>
         <p className="mt-1 text-sm text-slate-600">
           {rating?.avg_rating ? `★ ${rating.avg_rating} (${rating.review_count} ulasan)` : "Belum ada ulasan"}
           {venue.maps_url && (

@@ -5,11 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export default async function Home() {
   const supabase = await createClient();
 
-  const [{ data: cities }, { data: districts }, { data: sportTypes }] = await Promise.all([
-    supabase.from("cities").select("id, name").order("name"),
-    supabase.from("districts").select("id, city_id, name").order("name"),
-    supabase.from("sport_types").select("id, name").order("name"),
-  ]);
+  const { data: sportTypes } = await supabase.from("sport_types").select("id, name").order("name");
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -23,13 +19,13 @@ export default async function Home() {
       </section>
 
       <main className="mx-auto -mt-8 max-w-5xl px-4 pb-16">
-        <SearchForm cities={cities ?? []} districts={districts ?? []} sportTypes={sportTypes ?? []} />
+        <SearchForm sportTypes={sportTypes ?? []} />
 
         <section className="mt-12">
           <h2 className="text-xl font-bold text-slate-800">Cara kerja</h2>
           <ol className="mt-4 grid gap-4 sm:grid-cols-3">
             {[
-              ["1", "Cari", "Pilih kota, kecamatan, olahraga, tanggal, dan jam."],
+              ["1", "Cari", "Pilih olahraga, tanggal, dan jam."],
               ["2", "Bandingkan", "Lihat harga, fasilitas, dan ulasan venue yang tersedia."],
               ["3", "Booking", "Bayar lewat QRIS venue dan unggah bukti pembayaran."],
             ].map(([n, title, desc]) => (
