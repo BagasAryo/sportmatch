@@ -22,7 +22,9 @@ export default async function SiteHeader() {
                 {dashLabel}
               </Link>
               <NotificationBellLoader userId={profile.id} />
-              <span className="hidden text-slate-500 sm:inline">{profile.full_name}</span>
+              <Link href="/profile" className="hidden text-slate-500 hover:text-brand-600 sm:inline">
+                {profile.full_name}
+              </Link>
               <form action={logout}>
                 <button className="rounded border px-3 py-1 hover:bg-slate-100">Keluar</button>
               </form>
