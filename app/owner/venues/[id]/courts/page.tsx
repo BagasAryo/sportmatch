@@ -21,7 +21,7 @@ export default async function CourtsPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="max-w-2xl">
-      <Link href="/owner" className="text-sm text-brand-600 underline">
+      <Link href="/owner" className="text-sm font-medium text-brand-600 hover:underline">
         &larr; Kembali ke venue saya
       </Link>
       <h1 className="mt-2 text-2xl font-bold text-slate-800">Lapangan: {venue.name}</h1>
@@ -30,12 +30,12 @@ export default async function CourtsPage({ params }: { params: Promise<{ id: str
         {courts && courts.length > 0 ? (
           courts.map((c) => <CourtRow key={c.id} court={c} venueId={id} sportTypes={sportTypes ?? []} />)
         ) : (
-          <li className="rounded border border-dashed bg-white p-6 text-center text-slate-500">Belum ada lapangan. Tambahkan di bawah.</li>
+          <li className="rounded-xl border border-dashed bg-white p-6 text-center text-slate-500">Belum ada lapangan. Tambahkan di bawah.</li>
         )}
       </ul>
 
       <h2 className="mb-3 mt-8 text-lg font-semibold text-slate-800">Tambah lapangan</h2>
-      <div className="rounded-lg border bg-white p-6">
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
         <CourtForm venueId={id} sportTypes={sportTypes ?? []} />
       </div>
     </div>

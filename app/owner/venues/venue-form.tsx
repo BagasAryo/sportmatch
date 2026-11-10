@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Button from "@/components/ui/button";
+import Field from "@/components/ui/field";
+import Input from "@/components/ui/input";
+import Notice from "@/components/ui/notice";
+import Textarea from "@/components/ui/textarea";
 
 export type VenueData = {
   id: string;
@@ -19,6 +24,9 @@ export type VenueData = {
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+
+const sectionClass = "space-y-4 rounded-xl border bg-white p-6 shadow-sm";
+const fileClass = "block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100";
 
 function validateImage(file: File): string | null {
   if (!ALLOWED_TYPES.includes(file.type)) {
@@ -120,80 +128,76 @@ export default function VenueForm({ ownerId, defaultDistrictId, venue }: { owner
     }
   }
 
-  const inputClass = "mt-1 w-full rounded border border-slate-300 px-3 py-2 focus:border-brand-600 focus:outline-none";
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-lg border bg-white p-6">
-      {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {error && <Notice tone="error">{error}</Notice>}
 
-      <div>
-        <label className="block text-sm font-medium">Nama venue</label>
-        <input required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
-      </div>
+      <section className={sectionClass}>
+        <h2 className="font-semibold text-slate-800">Informasi dasar</h2>
+        <Field label="Nama venue" htmlFor="name">
+          <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
+        </Field>
+        <Field label="Alamat lengkap" htmlFor="address">
+          <Input id="address" required value={address} onChange={(e) => setAddress(e.target.value)} />
+        </Field>
+        <Field label="Tautan Google Maps (opsional)" htmlFor="maps">
+          <Input id="maps" type="url" value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} placeholder="https://maps.google.com/..." />
+        </Field>
+        <Field label="Deskripsi" htmlFor="description">
+          <Textarea id="description" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+        </Field>
+        <Field label="Fasilitas" htmlFor="facilities" hint="Pisahkan dengan koma.">
+          <Input id="facilities" value={facilities} onChange={(e) => setFacilities(e.target.value)} placeholder="Toilet, Parkir, Kantin, Musala" />
+        </Field>
+      </section>
 
-      <div>
-        <label className="block text-sm font-medium">Alamat lengkap</label>
-        <input required value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
-      </div>
+      <section className={sectionClass}>
+        <h2 className="font-semibold text-slate-800">Foto venue</h2>
+        <Field label="Unggah foto" htmlFor="photos" hint="JPG, PNG, atau WebP, maksimal 2 MB per foto.">
+          {photoUrls.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-3">
+              {photoUrls.map((url) => (
+                <div key={url} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="Foto venue" className="h-24 w-32 rounded-lg object-cover" />
+                  <button type="button" onClick={() => setPhotoUrls((prev) => prev.filter((u) => u !== url))} className="absolute right-1 top-1 rounded-md bg-white/90 px-1.5 py-0.5 text-xs font-medium text-red-600 hover:bg-white">
+                    Hapus
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(e) => setNewPhotos(Array.from(e.target.files ?? []))} className={fileClass} />
+        </Field>
+      </section>
 
-      <div>
-        <label className="block text-sm font-medium">Tautan Google Maps (opsional)</label>
-        <input type="url" value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} className={inputClass} placeholder="https://maps.google.com/..." />
-      </div>
+      <section className={sectionClass}>
+        <h2 className="font-semibold text-slate-800">QRIS pembayaran</h2>
+        {!qrisUrl && !newQris && <Notice tone="warning">Venue tanpa QRIS tidak muncul di pencarian dan tidak bisa dibooking.</Notice>}
+        <Field label="Gambar QRIS venue" htmlFor="qris" hint="Untuk demo, pakai QRIS uji milikmu sendiri.">
+          {qrisUrl && (
+            <div className="mb-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={qrisUrl} alt="QRIS venue" className="h-40 w-40 rounded-lg border object-contain" />
+            </div>
+          )}
+          <input id="qris" type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setNewQris(e.target.files?.[0] ?? null)} className={fileClass} />
+        </Field>
+      </section>
 
-      <div>
-        <label className="block text-sm font-medium">Deskripsi</label>
-        <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className={inputClass} />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Fasilitas (pisahkan dengan koma)</label>
-        <input value={facilities} onChange={(e) => setFacilities(e.target.value)} className={inputClass} placeholder="Toilet, Parkir, Kantin, Musala" />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Foto venue</label>
-        {photoUrls.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-3">
-            {photoUrls.map((url) => (
-              <div key={url} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="Foto venue" className="h-24 w-32 rounded object-cover" />
-                <button type="button" onClick={() => setPhotoUrls((prev) => prev.filter((u) => u !== url))} className="absolute right-1 top-1 rounded bg-white/90 px-1.5 text-xs text-red-600">
-                  Hapus
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(e) => setNewPhotos(Array.from(e.target.files ?? []))} className="mt-2 block text-sm" />
-        <p className="mt-1 text-xs text-slate-500">JPG, PNG, atau WebP, maksimal 2 MB per foto.</p>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Gambar QRIS venue</label>
-        {qrisUrl && (
-          <div className="mt-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrisUrl} alt="QRIS venue" className="h-40 w-40 rounded border object-contain" />
-          </div>
-        )}
-        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setNewQris(e.target.files?.[0] ?? null)} className="mt-2 block text-sm" />
-        <p className="mt-1 text-xs text-slate-500">Venue tanpa QRIS tidak bisa dibooking. Untuk demo, pakai QRIS uji milikmu sendiri.</p>
-      </div>
-
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-        Venue aktif (tampil di pencarian)
-      </label>
+      <section className={sectionClass}>
+        <h2 className="font-semibold text-slate-800">Status</h2>
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+          <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-4 w-4 accent-brand-600" />
+          Venue aktif (tampil di pencarian)
+        </label>
+      </section>
 
       <div className="flex gap-3">
-        <button disabled={saving} className="rounded bg-brand-600 px-5 py-2 text-white hover:bg-brand-700 disabled:opacity-60">
-          {saving ? "Menyimpan..." : "Simpan venue"}
-        </button>
-        <button type="button" onClick={() => router.push("/owner")} className="rounded border px-5 py-2 hover:bg-slate-100">
+        <Button disabled={saving}>{saving ? "Menyimpan..." : "Simpan venue"}</Button>
+        <Button type="button" variant="outline" onClick={() => router.push("/owner")}>
           Batal
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -4,6 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { first } from "@/lib/utils";
+import { rupiah } from "@/lib/format";
+import Button from "@/components/ui/button";
+import Field from "@/components/ui/field";
+import Input from "@/components/ui/input";
+import Notice from "@/components/ui/notice";
+import Select from "@/components/ui/select";
 
 export type SportType = { id: string; name: string };
 
@@ -15,15 +21,8 @@ export type CourtData = {
   close_time: string;
   price_per_hour: number;
   is_active: boolean;
-  sport_types: { name: string } | {name: string}[] | null;
+  sport_types: { name: string } | { name: string }[] | null;
 };
-
-const rupiah = (n: number) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(n);
 
 export function CourtForm({ venueId, sportTypes, court, onDone }: { venueId: string; sportTypes: SportType[]; court?: CourtData; onDone?: () => void }) {
   const router = useRouter();
@@ -36,6 +35,9 @@ export function CourtForm({ venueId, sportTypes, court, onDone }: { venueId: str
   const [price, setPrice] = useState(String(court?.price_per_hour ?? ""));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  // id unik per form supaya label tidak bentrok saat beberapa form tampil bersamaan
+  const uid = court?.id ?? "new";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -75,48 +77,41 @@ export function CourtForm({ venueId, sportTypes, court, onDone }: { venueId: str
     onDone?.();
   }
 
-  const inputClass = "mt-1 w-full rounded border border-slate-300 px-3 py-2 focus:border-brand-600 focus:outline-none";
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <Notice tone="error">{error}</Notice>}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="block text-sm font-medium">Nama lapangan</label>
-          <input required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="Lapangan 1" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Jenis olahraga</label>
-          <select required value={sportTypeId} onChange={(e) => setSportTypeId(e.target.value)} className={inputClass}>
+        <Field label="Nama lapangan" htmlFor={`name-${uid}`}>
+          <Input id={`name-${uid}`} required value={name} onChange={(e) => setName(e.target.value)} placeholder="Lapangan 1" />
+        </Field>
+        <Field label="Jenis olahraga" htmlFor={`sport-${uid}`}>
+          <Select id={`sport-${uid}`} required value={sportTypeId} onChange={(e) => setSportTypeId(e.target.value)}>
             <option value="">Pilih jenis olahraga</option>
             {sportTypes.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
               </option>
             ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Jam buka</label>
-          <input type="time" step={3600} required value={openTime} onChange={(e) => setOpenTime(e.target.value)} className={inputClass} />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Jam tutup</label>
-          <input type="time" step={3600} required value={closeTime} onChange={(e) => setCloseTime(e.target.value)} className={inputClass} />
-        </div>
+          </Select>
+        </Field>
+        <Field label="Jam buka" htmlFor={`open-${uid}`}>
+          <Input id={`open-${uid}`} type="time" step={3600} required value={openTime} onChange={(e) => setOpenTime(e.target.value)} />
+        </Field>
+        <Field label="Jam tutup" htmlFor={`close-${uid}`}>
+          <Input id={`close-${uid}`} type="time" step={3600} required value={closeTime} onChange={(e) => setCloseTime(e.target.value)} />
+        </Field>
         <div className="sm:col-span-2">
-          <label className="block text-sm font-medium">Harga per jam (Rp)</label>
-          <input type="number" min={1} step={1} required value={price} onChange={(e) => setPrice(e.target.value)} className={inputClass} placeholder="50000" />
+          <Field label="Harga per jam (Rp)" htmlFor={`price-${uid}`}>
+            <Input id={`price-${uid}`} type="number" min={1} step={1} required value={price} onChange={(e) => setPrice(e.target.value)} placeholder="50000" />
+          </Field>
         </div>
       </div>
       <div className="flex gap-3">
-        <button disabled={saving} className="rounded bg-brand-600 px-4 py-2 text-white hover:bg-brand-700 disabled:opacity-60">
-          {saving ? "Menyimpan..." : court ? "Simpan perubahan" : "Tambah lapangan"}
-        </button>
+        <Button disabled={saving}>{saving ? "Menyimpan..." : court ? "Simpan perubahan" : "Tambah lapangan"}</Button>
         {court && (
-          <button type="button" onClick={onDone} className="rounded border px-4 py-2 hover:bg-slate-100">
+          <Button type="button" variant="outline" onClick={onDone}>
             Batal
-          </button>
+          </Button>
         )}
       </div>
     </form>
@@ -138,31 +133,31 @@ export function CourtRow({ court, venueId, sportTypes }: { court: CourtData; ven
 
   if (editing) {
     return (
-      <li className="rounded-lg border bg-white p-4">
+      <li className="rounded-xl border bg-white p-4 shadow-sm">
         <CourtForm venueId={venueId} sportTypes={sportTypes} court={court} onDone={() => setEditing(false)} />
       </li>
     );
   }
 
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-white p-4">
+    <li className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white p-4 shadow-sm">
       <div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="font-semibold text-slate-800">{court.name}</span>
-          <span className="rounded bg-brand-50 px-2 py-0.5 text-xs text-brand-700">{first(court.sport_types)?.name}</span>
-          {!court.is_active && <span className="rounded bg-slate-200 px-2 py-0.5 text-xs">Nonaktif</span>}
+          <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700">{first(court.sport_types)?.name}</span>
+          {!court.is_active && <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">Nonaktif</span>}
         </div>
         <p className="mt-1 text-sm text-slate-600">
           {court.open_time.slice(0, 5)} - {court.close_time.slice(0, 5)} &middot; {rupiah(court.price_per_hour)} per jam
         </p>
       </div>
-      <div className="flex gap-2 text-sm">
-        <button onClick={() => setEditing(true)} className="rounded border px-3 py-1 hover:bg-slate-100">
+      <div className="flex gap-2">
+        <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)}>
           Edit
-        </button>
-        <button onClick={toggleActive} disabled={busy} className="rounded border px-3 py-1 hover:bg-slate-100 disabled:opacity-60">
+        </Button>
+        <Button type="button" variant="outline" size="sm" onClick={toggleActive} disabled={busy}>
           {court.is_active ? "Nonaktifkan" : "Aktifkan"}
-        </button>
+        </Button>
       </div>
     </li>
   );

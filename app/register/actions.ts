@@ -24,7 +24,9 @@ export async function register(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/register?error=${encodeURIComponent(error.message)}`);
+    // Pertahankan pilihan pemilik venue saat kembali ke formulir
+    const asOwner = ownerRequested ? "&as=owner" : "";
+    redirect(`/register?error=${encodeURIComponent(error.message)}${asOwner}`);
   }
 
   revalidatePath("/", "layout");
