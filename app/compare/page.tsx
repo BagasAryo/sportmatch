@@ -3,6 +3,9 @@ import SiteHeader from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { first } from "@/lib/utils";
 import { rupiah } from "@/lib/format";
+import SiteFooter from "@/components/site-footer";
+import ProblemPage from "@/components/problem-page";
+import { buttonClass } from "@/components/ui/button";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const hourOf = (t: string) => parseInt(t.slice(0, 2), 10);
@@ -17,17 +20,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
     .slice(0, 3);
 
   if (idList.length < 2) {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        <SiteHeader />
-        <main className="mx-auto max-w-xl px-4 py-10">
-          <p className="rounded bg-amber-50 px-4 py-3 text-amber-800">Pilih minimal 2 venue dari hasil pencarian untuk dibandingkan.</p>
-          <Link href="/" className="mt-4 inline-block text-brand-600 underline">
-            Kembali ke beranda
-          </Link>
-        </main>
-      </div>
-    );
+    return <ProblemPage message="Pilih minimal 2 venue dari hasil pencarian untuk dibandingkan." />;
   }
 
   const supabase = await createClient();
@@ -86,18 +79,18 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
         <h1 className="text-2xl font-bold text-slate-800">Bandingkan venue</h1>
         <p className="mt-1 text-sm text-slate-600">Nilai terbaik pada harga dan rating ditandai hijau.</p>
 
-        <div className="mt-5 overflow-x-auto rounded-lg border bg-white">
+        <div className="mt-5 overflow-x-auto rounded-xl border bg-white shadow-sm">
           <table className="w-full min-w-160 text-sm">
             <thead>
-              <tr className="border-b bg-slate-50 text-left">
+              <tr className="border-b bg-brand-50 text-left">
                 <th className="w-36 p-3 font-medium text-slate-600"></th>
                 {rows.map((r) => (
                   <th key={r.id} className="p-3 align-top">
                     {r.photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={r.photo} alt={r.name} className="mb-2 h-28 w-full rounded object-cover" />
+                      <img src={r.photo} alt={r.name} className="mb-2 h-28 w-full rounded-lg object-cover" />
                     ) : (
-                      <div className="mb-2 flex h-28 items-center justify-center rounded bg-brand-50 text-xs text-brand-700">Belum ada foto</div>
+                      <div className="mb-2 flex h-28 items-center justify-center rounded-lg bg-brand-50 text-xs text-brand-700">Belum ada foto</div>
                     )}
                     <span className="text-base font-semibold text-slate-800">{r.name}</span>
                     {r.isPromoted && <span className="ml-2 rounded bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">Promoted</span>}
@@ -174,7 +167,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                 <td className="p-3 text-slate-600">Status booking</td>
                 {rows.map((r) => (
                   <td key={r.id} className="p-3">
-                    {r.canBook ? <span className="text-green-700">Bisa dibooking</span> : <span className="text-amber-700">Belum bisa dibooking</span>}
+                    {r.canBook ? <span className="text-green-700">Bisa dibooking</span> : <span className="text-accent-600">Belum bisa dibooking</span>}
                   </td>
                 ))}
               </tr>
@@ -182,7 +175,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                 <td className="p-3"></td>
                 {rows.map((r) => (
                   <td key={r.id} className="p-3">
-                    <Link href={`/venues/${r.id}${query ? `?${query}` : ""}`} className="inline-block rounded bg-brand-600 px-4 py-2 text-white hover:bg-brand-700">
+                    <Link href={`/venues/${r.id}${query ? `?${query}` : ""}`} className={buttonClass("primary")}>
                       Lihat venue
                     </Link>
                   </td>

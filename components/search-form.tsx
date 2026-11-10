@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { hourLabel, todayWIB } from "@/lib/format";
+import Button from "@/components/ui/button";
+import Field from "@/components/ui/field";
+import Input from "@/components/ui/input";
+import Notice from "@/components/ui/notice";
+import Select from "@/components/ui/select";
 
 type Sport = { id: string; name: string };
 
@@ -42,53 +47,51 @@ export default function SearchForm({ sportTypes, initial }: { sportTypes: Sport[
     router.push(`/search?${params.toString()}`);
   }
 
-  const fieldClass = "mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 focus:border-brand-600 focus:outline-none";
-
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 rounded-lg border bg-white p-5 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
-      <div>
-        <label className="block text-sm font-medium">Jenis olahraga</label>
-        <select value={sportId} onChange={(e) => setSportId(e.target.value)} className={fieldClass}>
+    <form onSubmit={handleSubmit} className="grid gap-4 rounded-xl border bg-white p-5 shadow-lg sm:grid-cols-2 sm:p-6 lg:grid-cols-4">
+      <Field label="Jenis olahraga" htmlFor="sport">
+        <Select id="sport" value={sportId} onChange={(e) => setSportId(e.target.value)}>
           <option value="">Pilih olahraga</option>
           {sportTypes.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
             </option>
           ))}
-        </select>
-      </div>
+        </Select>
+      </Field>
 
-      <div>
-        <label className="block text-sm font-medium">Tanggal</label>
-        <input type="date" min={todayWIB()} value={date} onChange={(e) => setDate(e.target.value)} className={fieldClass} />
-      </div>
+      <Field label="Tanggal" htmlFor="date">
+        <Input id="date" type="date" min={todayWIB()} value={date} onChange={(e) => setDate(e.target.value)} />
+      </Field>
 
-      <div>
-        <label className="block text-sm font-medium">Jam mulai</label>
-        <select value={start} onChange={(e) => setStart(e.target.value)} className={fieldClass}>
+      <Field label="Jam mulai" htmlFor="start">
+        <Select id="start" value={start} onChange={(e) => setStart(e.target.value)}>
           {START_HOURS.map((h) => (
             <option key={h} value={hourLabel(h)}>
               {hourLabel(h)}
             </option>
           ))}
-        </select>
-      </div>
+        </Select>
+      </Field>
 
-      <div>
-        <label className="block text-sm font-medium">Jam selesai</label>
-        <select value={end} onChange={(e) => setEnd(e.target.value)} className={fieldClass}>
+      <Field label="Jam selesai" htmlFor="end">
+        <Select id="end" value={end} onChange={(e) => setEnd(e.target.value)}>
           {END_HOURS.map((h) => (
             <option key={h} value={hourLabel(h)}>
               {hourLabel(h)}
             </option>
           ))}
-        </select>
-      </div>
+        </Select>
+      </Field>
 
-      {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700 sm:col-span-2 lg:col-span-4">{error}</p>}
+      {error && (
+        <Notice tone="error" className="sm:col-span-2 lg:col-span-4">
+          {error}
+        </Notice>
+      )}
 
       <div className="sm:col-span-2 lg:col-span-4">
-        <button className="w-full rounded bg-accent-500 px-5 py-3 font-semibold text-white hover:bg-accent-600 sm:w-auto">Cari venue</button>
+        <Button variant="accent">Cari venue</Button>
       </div>
     </form>
   );

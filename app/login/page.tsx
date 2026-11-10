@@ -1,38 +1,34 @@
 import Link from "next/link";
 import { login } from "./actions";
+import AuthShell from "@/components/auth-shell";
+import Button from "@/components/ui/button";
+import Field from "@/components/ui/field";
+import Input from "@/components/ui/input";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
   const { error, next } = await searchParams;
 
   return (
-    <main className="mx-auto max-w-sm p-8">
-      <h1 className="text-2xl font-bold">Masuk ke SportMatch</h1>
+    <AuthShell title="Masuk" subtitle="Masuk untuk melihat booking dan mengelola akunmu.">
+      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>}
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-
-      <form action={login} className="mt-6 space-y-4">
+      <form action={login} className="space-y-4">
         <input type="hidden" name="next" value={next ?? "/"} />
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium">
-            Email
-          </label>
-          <input id="email" name="email" type="email" required className="mt-1 w-full rounded border px-3 py-2" />
-        </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium">
-            Kata sandi
-          </label>
-          <input id="password" name="password" type="password" required className="mt-1 w-full rounded border px-3 py-2" />
-        </div>
-        <button className="w-full rounded bg-blue-700 px-4 py-2 text-white">Masuk</button>
+        <Field label="Email" htmlFor="email">
+          <Input id="email" name="email" type="email" autoComplete="email" required />
+        </Field>
+        <Field label="Kata sandi" htmlFor="password">
+          <Input id="password" name="password" type="password" autoComplete="current-password" required />
+        </Field>
+        <Button full>Masuk</Button>
       </form>
 
-      <p className="mt-4 text-sm">
+      <p className="mt-5 text-center text-sm text-slate-600">
         Belum punya akun?{" "}
-        <Link href="/register" className="text-blue-700 underline">
+        <Link href="/register" className="font-medium text-brand-600 hover:underline">
           Daftar
         </Link>
       </p>
-    </main>
+    </AuthShell>
   );
 }

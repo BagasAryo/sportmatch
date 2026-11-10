@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Button from "@/components/ui/button";
+import Field from "@/components/ui/field";
+import Notice from "@/components/ui/notice";
+import Textarea from "@/components/ui/textarea";
 
 export default function ReviewForm({ bookingId }: { bookingId: string }) {
   const router = useRouter();
@@ -38,35 +42,25 @@ export default function ReviewForm({ bookingId }: { bookingId: string }) {
   const shown = hover || rating;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <Notice tone="error">{error}</Notice>}
 
       <div>
         <p className="text-sm font-medium text-slate-700">Rating kamu</p>
         <div className="mt-1 flex gap-1" onMouseLeave={() => setHover(0)}>
           {[1, 2, 3, 4, 5].map((n) => (
-            <button key={n} type="button" aria-label={`${n} bintang`} onMouseEnter={() => setHover(n)} onClick={() => setRating(n)} className={`text-3xl leading-none ${n <= shown ? "text-accent-500" : "text-slate-300"}`}>
+            <button key={n} type="button" aria-label={`${n} bintang`} onMouseEnter={() => setHover(n)} onClick={() => setRating(n)} className={`text-3xl leading-none transition ${n <= shown ? "text-accent-500" : "text-slate-300"}`}>
               ★
             </button>
           ))}
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700">Komentar (opsional)</label>
-        <textarea
-          rows={3}
-          maxLength={500}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Ceritakan pengalamanmu di venue ini"
-          className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-brand-600 focus:outline-none"
-        />
-      </div>
+      <Field label="Komentar (opsional)" htmlFor="comment">
+        <Textarea id="comment" rows={3} maxLength={500} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Ceritakan pengalamanmu di venue ini" />
+      </Field>
 
-      <button disabled={busy} className="rounded bg-brand-600 px-5 py-2 text-white hover:bg-brand-700 disabled:opacity-60">
-        {busy ? "Mengirim..." : "Kirim ulasan"}
-      </button>
+      <Button disabled={busy}>{busy ? "Mengirim..." : "Kirim ulasan"}</Button>
     </form>
   );
 }

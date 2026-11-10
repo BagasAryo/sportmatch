@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/site-header";
+import SiteFooter from "@/components/site-footer";
 import Availability, { type CourtInfo } from "@/components/availability";
 import { createClient } from "@/lib/supabase/server";
 import { first } from "@/lib/utils";
@@ -118,7 +119,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
           ) : (
             <ul className="space-y-3">
               {reviews.map((r) => (
-                <li key={r.id} className="rounded-lg border bg-white p-4">
+                <li key={r.id} className="rounded-xl border bg-white p-4">
                   <p className="font-medium text-accent-600">
                     {"★".repeat(r.rating)}
                     <span className="text-slate-300">{"★".repeat(5 - r.rating)}</span>
@@ -137,6 +138,24 @@ export default async function VenueDetailPage({ params, searchParams }: { params
           )}
         </section>
       </main>
+      <p className="mt-1 text-sm text-slate-600">
+        {rating?.avg_rating ? (
+          <>
+            <span className="text-accent-500">★</span> {rating.avg_rating} ({rating.review_count} ulasan)
+          </>
+        ) : (
+          "Belum ada ulasan"
+        )}
+        {venue.maps_url && (
+          <>
+            {" "}
+            &middot;{" "}
+            <a href={venue.maps_url} target="_blank" rel="noopener noreferrer" className="text-brand-600 underline">
+              Lihat di Google Maps
+            </a>
+          </>
+        )}
+      </p>
     </div>
   );
 }

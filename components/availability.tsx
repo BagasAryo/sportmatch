@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { formatDateID, hourLabel, rupiah, todayWIB } from "@/lib/format";
+import Input from "@/components/ui/input";
+import { buttonClass } from "@/components/ui/button";
 
 export type CourtInfo = {
   id: string;
@@ -117,18 +119,22 @@ export default function Availability({ courts, defaultDate, defaultStart, defaul
   return (
     <div>
       <div className="flex flex-wrap items-end gap-4">
-        <div>
-          <label className="block text-sm font-medium">Tanggal</label>
-          <input
-            type="date"
-            min={today}
-            value={date}
-            onChange={(e) => {
-              setDate(e.target.value || today);
-              setSel(null);
-            }}
-            className="mt-1 rounded border border-slate-300 bg-white px-3 py-2 focus:border-brand-600 focus:outline-none"
-          />
+        <div className="w-48">
+          <label htmlFor="booking-date" className="block text-sm font-medium text-slate-700">
+            Tanggal
+          </label>
+          <div className="mt-1">
+            <Input
+              id="booking-date"
+              type="date"
+              min={today}
+              value={date}
+              onChange={(e) => {
+                setDate(e.target.value || today);
+                setSel(null);
+              }}
+            />
+          </div>
         </div>
         <p className="pb-2 text-sm text-slate-600">{formatDateID(date)}</p>
       </div>
@@ -153,7 +159,7 @@ export default function Availability({ courts, defaultDate, defaultStart, defaul
           const close = hourOf(c.close_time);
           const slots = Array.from({ length: close - open }, (_, i) => open + i);
           return (
-            <div key={c.id} className="rounded-lg border bg-white p-4">
+            <div key={c.id} className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <span className="font-semibold text-slate-800">{c.name}</span>
@@ -173,7 +179,7 @@ export default function Availability({ courts, defaultDate, defaultStart, defaul
                       ? "cursor-not-allowed border-slate-200 bg-slate-200 text-slate-400 line-through"
                       : "border-slate-300 bg-white text-slate-800 hover:border-brand-600";
                   return (
-                    <button key={h} type="button" disabled={taken || loading} onClick={() => clickSlot(c.id, h)} className={`rounded border px-2 py-1.5 text-sm ${cls}`}>
+                    <button key={h} type="button" disabled={taken || loading} onClick={() => clickSlot(c.id, h)} className={`rounded-lg border px-2 py-1.5 text-sm ${cls}`}>
                       {hourLabel(h)}
                     </button>
                   );
@@ -184,7 +190,7 @@ export default function Availability({ courts, defaultDate, defaultStart, defaul
         })}
       </div>
 
-      <div className="sticky bottom-0 mt-4 rounded-lg border bg-white p-4 shadow-lg">
+      <div className="sticky bottom-0 mt-4 rounded-xl border bg-white p-4 shadow-lg">
         {!canBook ? (
           <p className="text-sm text-amber-800">Venue ini belum bisa dibooking (QRIS atau lapangan belum tersedia).</p>
         ) : sel && selCourt ? (
@@ -197,7 +203,7 @@ export default function Availability({ courts, defaultDate, defaultStart, defaul
                 {hours} &times; {rupiah(selCourt.price_per_hour)} = <span className="font-semibold text-brand-700">{rupiah(subtotal)}</span> (belum termasuk biaya layanan)
               </p>
             </div>
-            <Link href={`/checkout?court=${selCourt.id}&date=${date}&start=${hourLabel(sel.start)}&end=${hourLabel(sel.end)}`} className="rounded bg-accent-500 px-5 py-2 font-semibold text-white hover:bg-accent-600">
+            <Link href={`/checkout?court=${selCourt.id}&date=${date}&start=${hourLabel(sel.start)}&end=${hourLabel(sel.end)}`} className={buttonClass("accent")}>
               Lanjut booking
             </Link>
           </div>

@@ -1,6 +1,9 @@
 import Link from "next/link";
 import SiteHeader from "@/components/site-header";
+import SiteFooter from "@/components/site-footer";
 import StatusBadge from "@/components/status-badge";
+import Notice from "@/components/ui/notice";
+import { buttonClass } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
 import { first } from "@/lib/utils";
@@ -17,18 +20,18 @@ export default async function MyBookingsPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50">
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-4 py-8">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
         <h1 className="text-2xl font-bold text-slate-800">Booking saya</h1>
 
         {!bookings || bookings.length === 0 ? (
-          <p className="mt-6 rounded border border-dashed bg-white p-8 text-center text-slate-500">
+          <div className="mt-6 rounded-xl border border-dashed bg-white p-8 text-center text-slate-500">
             Belum ada booking.{" "}
-            <Link href="/" className="text-brand-600 underline">
+            <Link href="/" className="font-medium text-brand-600 hover:underline">
               Cari venue
             </Link>
-          </p>
+          </div>
         ) : (
           <ul className="mt-6 space-y-3">
             {bookings.map((b) => {
@@ -36,7 +39,7 @@ export default async function MyBookingsPage() {
               const venue = first(court?.venues);
               const needsAction = b.status === "menunggu_bayar" || b.status === "menunggu_verifikasi";
               return (
-                <li key={b.id} className="rounded-lg border bg-white p-4">
+                <li key={b.id} className="rounded-xl border bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <p className="font-semibold text-slate-800">{venue?.name}</p>
@@ -50,21 +53,23 @@ export default async function MyBookingsPage() {
                     {formatDateID(b.booking_date)} &middot; {b.start_time.slice(0, 5)} - {b.end_time.slice(0, 5)}
                   </p>
                   <p className="text-sm font-medium text-brand-700">{rupiah(b.total_price)}</p>
-                  {b.status === "ditolak" && b.rejection_note && <p className="mt-2 rounded bg-red-50 px-3 py-1.5 text-sm text-red-800">Alasan penolakan: {b.rejection_note}</p>}
-                  
-                    <Link
-                      href={`/bookings/${b.id}`}
-                      className={needsAction ? "mt-3 inline-block rounded bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-600" : "mt-3 inline-block rounded border px-4 py-1.5 text-sm hover:bg-slate-100"}
-                    >
-                      {b.status === "menunggu_bayar" ? "Lanjutkan pembayaran" : b.status === "menunggu_verifikasi" ? "Lihat status" : "Lihat detail"}
-                    </Link>
-                  
+
+                  {b.status === "ditolak" && b.rejection_note && (
+                    <Notice tone="error" className="mt-2">
+                      Alasan penolakan: {b.rejection_note}
+                    </Notice>
+                  )}
+
+                  <Link href={`/bookings/${b.id}`} className={`${buttonClass(needsAction ? "accent" : "outline")} mt-3`}>
+                    {b.status === "menunggu_bayar" ? "Lanjutkan pembayaran" : b.status === "menunggu_verifikasi" ? "Lihat status" : "Lihat detail"}
+                  </Link>
                 </li>
               );
             })}
           </ul>
         )}
       </main>
+      <SiteFooter />
     </div>
   );
 }

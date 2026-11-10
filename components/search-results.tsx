@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { rupiah } from "@/lib/format";
+import { buttonClass } from "./ui/button";
 
 export type SearchResult = {
   venue_id: string;
@@ -66,7 +67,7 @@ export default function SearchResults({ results, detailQuery, compareQuery }: { 
                   <p className="text-xs text-slate-600">
                     {r.avg_rating ? (
                       <>
-                        <span className="text-yellow-400">★</span> {r.avg_rating} <span className="text-slate-400">({r.review_count})</span>
+                        <span className="text-accent-500">★</span> {r.avg_rating} <span className="text-slate-400">({r.review_count})</span>
                       </>
                     ) : (
                       <span className="text-slate-400">Belum ada ulasan</span>
@@ -79,7 +80,11 @@ export default function SearchResults({ results, detailQuery, compareQuery }: { 
 
               {/* Tombol Bandingkan */}
               <div className="border-t p-2.5">
-                <button type="button" onClick={() => toggle(r.venue_id)} className={`w-full rounded px-2.5 py-1 text-xs font-medium transition ${checked ? "bg-brand-700 text-white" : "border text-slate-700 hover:bg-slate-100"}`}>
+                <button
+                  type="button"
+                  onClick={() => toggle(r.venue_id)}
+                  className={`w-full rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${checked ? "bg-brand-600 text-white" : "border border-slate-300 text-slate-700 hover:bg-brand-50"}`}
+                >
                   {checked ? "✓ Dipilih" : "+ Bandingkan"}
                 </button>
               </div>
@@ -89,7 +94,7 @@ export default function SearchResults({ results, detailQuery, compareQuery }: { 
       </ul>
 
       {selected.length > 0 && (
-        <div className="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-white p-4 shadow-lg">
+        <div className="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white p-4 shadow-lg">
           <div className="text-sm">
             <p className="font-semibold text-slate-800">{selected.length} venue dipilih</p>
             <p className="text-slate-600">{notice || (selected.length < 2 ? "Pilih minimal 2 venue untuk dibandingkan." : "Siap dibandingkan.")}</p>
@@ -100,16 +105,16 @@ export default function SearchResults({ results, detailQuery, compareQuery }: { 
                 setSelected([]);
                 setNotice("");
               }}
-              className="rounded border px-3 py-2 text-sm hover:bg-slate-100"
+              className={buttonClass("outline")}
             >
               Reset
             </button>
             {selected.length >= 2 ? (
-              <Link href={`/compare?ids=${selected.join(",")}&${compareQuery}`} className="rounded bg-accent-500 px-4 py-2 text-sm font-semibold text-white hover:bg-accent-600">
+              <Link href={`/compare?ids=${selected.join(",")}&${compareQuery}`} className={buttonClass("accent")}>
                 Bandingkan sekarang
               </Link>
             ) : (
-              <span className="cursor-not-allowed rounded bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-500">Bandingkan sekarang</span>
+              <span className="inline-flex cursor-not-allowed items-center rounded-lg bg-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500">Bandingkan sekarang</span>
             )}
           </div>
         </div>

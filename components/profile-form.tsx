@@ -2,35 +2,30 @@
 
 import { useActionState } from "react";
 import { updateProfile, type ProfileState } from "@/app/profile/actions";
+import Button from "@/components/ui/button";
+import Field from "@/components/ui/field";
+import Input from "@/components/ui/input";
+import Notice from "@/components/ui/notice";
 
 export default function ProfileForm({ fullName, phone, email }: { fullName: string; phone: string; email: string }) {
   const [state, action, pending] = useActionState<ProfileState, FormData>(updateProfile, {});
 
   return (
-    <form action={action} className="mt-6 space-y-4 rounded-lg border bg-white p-5">
-      <div>
-        <label className="block text-sm font-medium text-slate-700">Email</label>
-        <input value={email} disabled className="mt-1 w-full rounded border bg-slate-100 px-3 py-2 text-slate-500" />
-      </div>
-      <div>
-        <label htmlFor="full_name" className="block text-sm font-medium text-slate-700">
-          Nama lengkap
-        </label>
-        <input id="full_name" name="full_name" defaultValue={fullName} required className="mt-1 w-full rounded border px-3 py-2" />
-      </div>
-      <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
-          Nomor HP
-        </label>
-        <input id="phone" name="phone" defaultValue={phone} placeholder="081234567890" className="mt-1 w-full rounded border px-3 py-2" />
-      </div>
+    <form action={action} className="mt-6 space-y-4 rounded-xl border bg-white p-6 shadow-sm">
+      <Field label="Email" htmlFor="email" hint="Email tidak bisa diubah.">
+        <Input id="email" defaultValue={email} disabled />
+      </Field>
+      <Field label="Nama lengkap" htmlFor="full_name">
+        <Input id="full_name" name="full_name" defaultValue={fullName} autoComplete="name" required />
+      </Field>
+      <Field label="Nomor HP" htmlFor="phone">
+        <Input id="phone" name="phone" type="tel" defaultValue={phone} autoComplete="tel" placeholder="081234567890" />
+      </Field>
 
-      {state.error && <p className="rounded bg-red-50 px-3 py-1.5 text-sm text-red-800">{state.error}</p>}
-      {state.success && <p className="rounded bg-green-50 px-3 py-1.5 text-sm text-green-800">Profil berhasil disimpan</p>}
+      {state.error && <Notice tone="error">{state.error}</Notice>}
+      {state.success && <Notice tone="success">Profil berhasil disimpan</Notice>}
 
-      <button disabled={pending} className="rounded bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60">
-        {pending ? "Menyimpan..." : "Simpan perubahan"}
-      </button>
+      <Button disabled={pending}>{pending ? "Menyimpan..." : "Simpan perubahan"}</Button>
     </form>
   );
 }

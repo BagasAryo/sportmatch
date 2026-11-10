@@ -37,7 +37,7 @@ export default function NotificationBell({ userId, initialCount }: { userId: str
   }, [supabase, userId]);
 
   return (
-    <Link href="/notifications" aria-label={`Notifikasi, ${count} belum dibaca`} className="relative rounded p-1.5 text-slate-700 hover:bg-slate-100">
+    <Link href="/notifications" aria-label={`Notifikasi, ${count} belum dibaca`} className="relative rounded-full p-2 text-slate-700 hover:bg-slate-100">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
         <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />

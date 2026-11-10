@@ -1,21 +1,10 @@
 import SiteHeader from "@/components/site-header";
+import SiteFooter from "@/components/site-footer";
 import SearchForm from "@/components/search-form";
+import Notice from "@/components/ui/notice";
+import SearchResults, { type SearchResult } from "@/components/search-results";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateID, todayWIB } from "@/lib/format";
-import SearchResults from "@/components/search-results";
-
-type Result = {
-  venue_id: string;
-  venue_name: string;
-  address: string;
-  district_name: string;
-  photo_url: string | null;
-  is_promoted: boolean;
-  avg_rating: number | null;
-  review_count: number;
-  min_price: number;
-  available_courts: number;
-};
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const { sport, date, start, end } = await searchParams;
@@ -23,7 +12,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   const { data: sportTypes } = await supabase.from("sport_types").select("id, name").order("name");
 
-  let results: Result[] = [];
+  let results: SearchResult[] = [];
   let message = "";
 
   const validShape = sport && date && start && end && /^\d{4}-\d{2}-\d{2}$/.test(date) && /^\d{2}:00$/.test(start) && /^\d{2}:00$/.test(end);
@@ -44,40 +33,44 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     if (error) {
       message = `Pencarian gagal: ${error.message}`;
     } else {
-      results = (data ?? []) as Result[];
+      results = (data ?? []) as SearchResult[];
     }
   }
 
-  const sportName = sportTypes?.find((s) => s.id === sport)?.name;
-
+  const sportName = sportTypes?.find((s) => s.id === sport)?.name ?? "";
+  const showResults = !!validShape && !message;
   const detailQuery = `date=${date}&start=${start}&end=${end}&sport=${sport}`;
 
   return (
     <div className="min-h-screen bg-slate-50">
       <SiteHeader />
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <details className="mb-6 rounded-lg border bg-white p-4">
-          <summary className="cursor-pointer text-sm font-medium text-brand-700">Ubah pencarian</summary>
-          <div className="mt-4">
-            <SearchForm sportTypes={sportTypes ?? []} initial={{ sport, date, start, end }} />
-          </div>
-        </details>
 
-        {validShape && !message && (
-          <>
-            <h1 className="text-2xl font-bold text-slate-800">Venue {sportName}</h1>
-            <p className="mt-1 text-sm text-slate-600">
+      <section className="bg-brand-600 px-4 pb-20 pt-8 text-white">
+        <div className="mx-auto max-w-5xl">
+          <h1 className="text-2xl font-bold sm:text-3xl">{showResults ? `Venue ${sportName}`.trim() : "Cari venue"}</h1>
+          {showResults && (
+            <p className="mt-1 text-brand-100">
               {formatDateID(date!)} &middot; {start} - {end} &middot; {results.length} venue tersedia
             </p>
-          </>
+          )}
+        </div>
+      </section>
+
+      <main className="mx-auto -mt-12 max-w-5xl px-4 pb-16">
+        <SearchForm sportTypes={sportTypes ?? []} initial={{ sport, date, start, end }} />
+
+        {message && (
+          <Notice tone="warning" className="mt-4">
+            {message}
+          </Notice>
         )}
 
-        {message && <p className="rounded bg-amber-50 px-4 py-3 text-sm text-amber-800">{message}</p>}
+        {showResults && results.length === 0 && <div className="mt-6 rounded-xl border border-dashed bg-white p-8 text-center text-slate-500">Belum ada venue yang kosong pada waktu itu. Coba ubah jam atau tanggal.</div>}
 
-        {validShape && !message && results.length === 0 && <p className="mt-6 rounded border border-dashed bg-white p-8 text-center text-slate-500">Belum ada venue yang kosong pada waktu itu. Coba ubah jam atau tanggal.</p>}
-
-        <SearchResults results={results} detailQuery={detailQuery} compareQuery={`date=${date}&start=${start}&end=${end}&sport=${sport}`} />
+        <SearchResults results={results} detailQuery={detailQuery} compareQuery={detailQuery} />
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

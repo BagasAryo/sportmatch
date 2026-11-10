@@ -41,7 +41,7 @@ export default function PaymentCountdown({ bookingId, deadline, serverNow }: { b
   if (remaining === null) return null;
 
   return (
-    <div className={`rounded px-4 py-3 text-sm ${expired || remaining < 60_000 ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-800"}`}>
+    <div className={`rounded-lg px-4 py-3 text-sm ${expired || remaining < 60_000 ? "bg-red-50 text-red-800" : "bg-accent-50 text-accent-600"}`}>
       {expired ? (
         "Waktu pembayaran habis. Booking akan segera dibatalkan otomatis."
       ) : (

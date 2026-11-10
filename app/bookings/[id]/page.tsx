@@ -9,6 +9,7 @@ import { formatDateID, rupiah } from "@/lib/format";
 import PaymentActions from "./payment-actions";
 import PaymentCountdown from "./payment-countdown";
 import ReviewForm from "@/components/review-form";
+import Notice from "@/components/ui/notice";
 
 export default async function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -54,19 +55,29 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
         )}
 
         {booking.status === "menunggu_verifikasi" && (
-          <p className="mt-4 rounded bg-sky-50 px-4 py-3 text-sm text-sky-800">Bukti pembayaran sudah terkirim. Pemilik venue akan memverifikasinya dan kamu akan mendapat pemberitahuan setelah selesai.</p>
+          <Notice tone="info" className="mt-4">
+            Bukti pembayaran sudah terkirim. Pemilik venue akan memverifikasinya dan kamu akan mendapat pemberitahuan setelah selesai.
+          </Notice>
         )}
-        {booking.status === "dikonfirmasi" && <p className="mt-4 rounded bg-green-50 px-4 py-3 text-sm text-green-800">Pembayaran terverifikasi. Booking kamu sudah berlaku. Sampai jumpa di lapangan!</p>}
+        {booking.status === "dikonfirmasi" && (
+          <Notice tone="success" className="mt-4">
+            Pembayaran terverifikasi. Booking kamu sudah berlaku. Sampai jumpa di lapangan!
+          </Notice>
+        )}
         {booking.status === "ditolak" && (
-          <p className="mt-4 rounded bg-red-50 px-4 py-3 text-sm text-red-800">
+          <Notice tone="error" className="mt-4">
             Bukti pembayaran ditolak
             {booking.rejection_note ? `: ${booking.rejection_note}` : "."}
-          </p>
+          </Notice>
         )}
-        {booking.status === "dibatalkan" && <p className="mt-4 rounded bg-slate-100 px-4 py-3 text-sm text-slate-700">Booking ini dibatalkan. Booking yang belum dibayar dalam {timeoutMinutes} menit dibatalkan otomatis.</p>}
+        {booking.status === "dibatalkan" && (
+          <Notice tone="neutral" className="mt-4">
+            Booking ini dibatalkan. Booking yang belum dibayar dalam {timeoutMinutes} menit dibatalkan otomatis.
+          </Notice>
+        )}
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
-          <section className="rounded-lg border bg-white p-5">
+          <section className="rounded-xl border bg-white p-5">
             <h2 className="font-semibold text-slate-800">Detail booking</h2>
             <p className="mt-1 text-sm text-slate-600">{venue?.name}</p>
             <dl className="mt-4 space-y-2 text-sm">
@@ -105,7 +116,7 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
           </section>
 
           {(booking.status === "menunggu_bayar" || booking.status === "menunggu_verifikasi") && (
-            <section className="rounded-lg border bg-white p-5">
+            <section className="rounded-xl border bg-white p-5">
               <h2 className="font-semibold text-slate-800">Bayar dengan QRIS</h2>
               {venue?.qris_image_url ? (
                 <>
@@ -131,26 +142,24 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
           )}
         </div>
         {booking.status === "dikonfirmasi" && (
-          <section className="mt-6 rounded-lg border bg-white p-5">
-            {" "}
-            <h2 className="font-semibold text-slate-800">Ulasan</h2>{" "}
+          <section className="mt-6 rounded-xl border bg-white p-5">
+            <h2 className="font-semibold text-slate-800">Ulasan</h2>
             {review ? (
               <div className="mt-2">
-                {" "}
                 <p className="text-lg font-medium text-accent-500">
-                  {" "}
-                  {"★".repeat(review.rating)} <span className="text-slate-300">{"★".repeat(5 - review.rating)}</span>{" "}
-                </p>{" "}
-                {review.comment && <p className="mt-1 text-sm text-slate-700">{review.comment}</p>} <p className="mt-1 text-xs text-slate-500"> Terima kasih, ulasanmu sudah tampil di halaman venue. </p>{" "}
+                  {"★".repeat(review.rating)}
+                  <span className="text-slate-300">{"★".repeat(5 - review.rating)}</span>
+                </p>
+                {review.comment && <p className="mt-1 text-sm text-slate-700">{review.comment}</p>}
+                <p className="mt-1 text-xs text-slate-500">Terima kasih, ulasanmu sudah tampil di halaman venue.</p>
               </div>
             ) : ended ? (
               <div className="mt-3">
-                {" "}
-                <ReviewForm bookingId={booking.id} />{" "}
+                <ReviewForm bookingId={booking.id} />
               </div>
             ) : (
-              <p className="mt-2 text-sm text-slate-600"> Kamu bisa memberi ulasan setelah waktu booking selesai. </p>
-            )}{" "}
+              <p className="mt-2 text-sm text-slate-600">Kamu bisa memberi ulasan setelah waktu booking selesai.</p>
+            )}
           </section>
         )}
       </main>

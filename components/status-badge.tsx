@@ -1,11 +1,11 @@
 const STATUS: Record<string, { label: string; className: string }> = {
   menunggu_bayar: {
     label: "Menunggu pembayaran",
-    className: "bg-amber-100 text-amber-800",
+    className: "bg-accent-50 text-accent-600",
   },
   menunggu_verifikasi: {
     label: "Menunggu verifikasi",
-    className: "bg-sky-100 text-sky-800",
+    className: "bg-brand-50 text-brand-700",
   },
   dikonfirmasi: {
     label: "Dikonfirmasi",

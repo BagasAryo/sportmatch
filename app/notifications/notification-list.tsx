@@ -40,19 +40,19 @@ export default function NotificationList({ items, userId }: { items: Notificatio
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-600">{unread > 0 ? `${unread} belum dibaca` : "Semua sudah dibaca"}</p>
         {unread > 0 && (
-          <button onClick={markAllRead} disabled={busy} className="rounded border px-3 py-1 text-sm hover:bg-slate-100 disabled:opacity-60">
+          <button onClick={markAllRead} disabled={busy} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60">
             Tandai semua sudah dibaca
           </button>
         )}
       </div>
 
       {items.length === 0 ? (
-        <p className="mt-4 rounded border border-dashed bg-white p-8 text-center text-slate-500">Belum ada notifikasi.</p>
+        <div className="mt-4 rounded-xl border border-dashed bg-white p-8 text-center text-slate-500">Belum ada notifikasi.</div>
       ) : (
         <ul className="mt-4 space-y-2">
           {items.map((item) => (
             <li key={item.id}>
-              <button type="button" onClick={() => openItem(item)} className={`flex w-full items-start gap-3 rounded-lg border p-4 text-left hover:border-brand-600 ${item.is_read ? "bg-white" : "border-brand-100 bg-brand-50"}`}>
+              <button type="button" onClick={() => openItem(item)} className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left shadow-sm hover:border-brand-600 ${item.is_read ? "bg-white" : "border-brand-100 bg-brand-50"}`}>
                 <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${item.is_read ? "bg-transparent" : "bg-accent-500"}`} />
                 <span>
                   <span className={`block text-sm ${item.is_read ? "text-slate-700" : "font-semibold text-slate-900"}`}>{item.message}</span>

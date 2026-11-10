@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { rupiah } from "@/lib/format";
 import { useCountdown } from "./use-countdown";
+import Button from "@/components/ui/button";
+import Notice from "@/components/ui/notice";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
@@ -90,24 +92,30 @@ export default function PaymentActions({
 
   return (
     <div className="space-y-4">
-      {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <Notice tone="error">{error}</Notice>}
 
       <div className="flex flex-wrap items-center gap-3 rounded border bg-brand-50 p-3 text-sm">
         <span>
           Nominal yang harus dibayar: <strong className="text-brand-700">{rupiah(total)}</strong>
         </span>
-        <button type="button" onClick={copyAmount} className="rounded border bg-white px-3 py-1 hover:bg-slate-100">
+        <button type="button" onClick={copyAmount} className="rounded-lg border bg-white px-3 py-1.5 text-sm hover:bg-slate-100">
           {copied ? "Tersalin" : "Salin nominal"}
         </button>
       </div>
 
       <form onSubmit={handleUpload} className="space-y-3">
-        <label className="block text-sm font-medium">{status === "menunggu_bayar" ? "Unggah bukti pembayaran" : "Ganti bukti pembayaran (opsional)"}</label>
-        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block text-sm" />
+        <label htmlFor="proof" className="block text-sm font-medium text-slate-700">
+          {status === "menunggu_bayar" ? "Unggah bukti pembayaran" : "Ganti bukti pembayaran (opsional)"}
+        </label>
+        <input
+          id="proof"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100"
+        />
         <p className="text-xs text-slate-500">Screenshot bukti transfer, JPG, PNG, atau WebP, maksimal 2 MB.</p>
-        <button disabled={busy || expired} className="rounded bg-brand-600 px-5 py-2 text-white hover:bg-brand-700 disabled:opacity-60">
-          {busy ? "Memproses..." : "Kirim bukti pembayaran"}
-        </button>
+        <Button disabled={busy || expired}>{busy ? "Memproses..." : "Kirim bukti pembayaran"}</Button>
       </form>
 
       <button type="button" onClick={handleCancel} disabled={busy} className="text-sm text-red-600 underline disabled:opacity-60">
