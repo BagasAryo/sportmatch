@@ -5,6 +5,9 @@ import Button from "@/components/ui/button";
 import Field from "@/components/ui/field";
 import Input from "@/components/ui/input";
 import Notice from "@/components/ui/notice";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Daftar" };
 
 export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ error?: string; as?: string }> }) {
   const { error, as } = await searchParams;

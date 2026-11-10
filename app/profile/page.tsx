@@ -2,6 +2,9 @@ import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import ProfileForm from "@/components/profile-form";
 import { createClient } from "@/lib/supabase/server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Edit Profil" };
 
 export default async function ProfilePage() {
   const supabase = await createClient();

@@ -6,6 +6,9 @@ import { rupiah } from "@/lib/format";
 import SiteFooter from "@/components/site-footer";
 import ProblemPage from "@/components/problem-page";
 import { buttonClass } from "@/components/ui/button";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Bandingkan Venue" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const hourOf = (t: string) => parseInt(t.slice(0, 2), 10);
@@ -185,6 +188,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           </table>
         </div>
       </main>
+      <SiteFooter/>
     </div>
   );
 }

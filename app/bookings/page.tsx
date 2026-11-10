@@ -8,6 +8,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
 import { first } from "@/lib/utils";
 import { formatDateID, rupiah } from "@/lib/format";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Booking Saya" };
 
 export default async function MyBookingsPage() {
   const supabase = await createClient();

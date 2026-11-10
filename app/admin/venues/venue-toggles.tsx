@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Button from "@/components/ui/button";
 
 export default function VenueToggles({ venueId, isPromoted, isActive }: { venueId: string; isPromoted: boolean; isActive: boolean }) {
   const router = useRouter();
@@ -21,13 +22,13 @@ export default function VenueToggles({ venueId, isPromoted, isActive }: { venueI
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <div className="flex gap-2 text-sm">
-        <button onClick={() => update({ is_promoted: !isPromoted })} disabled={busy} className={`rounded px-3 py-1.5 disabled:opacity-60 ${isPromoted ? "bg-accent-500 text-white hover:bg-accent-600" : "border hover:bg-slate-100"}`}>
+      <div className="flex gap-2">
+        <Button type="button" variant={isPromoted ? "accent" : "outline"} size="sm" onClick={() => update({ is_promoted: !isPromoted })} disabled={busy}>
           {isPromoted ? "Promoted: aktif" : "Jadikan promoted"}
-        </button>
-        <button onClick={() => update({ is_active: !isActive })} disabled={busy} className="rounded border px-3 py-1.5 hover:bg-slate-100 disabled:opacity-60">
+        </Button>
+        <Button type="button" variant="outline" size="sm" onClick={() => update({ is_active: !isActive })} disabled={busy}>
           {isActive ? "Nonaktifkan" : "Aktifkan"}
-        </button>
+        </Button>
       </div>
       {error && <p className="text-xs text-red-600">{error}</p>}
     </div>

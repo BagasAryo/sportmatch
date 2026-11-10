@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-
-const inputClass = "w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-600 focus:outline-none";
-const buttonClass = "rounded bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700 disabled:opacity-60";
+import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
 
 function useSubmit() {
   const router = useRouter();
@@ -49,10 +48,8 @@ export function AddSportForm() {
       }}
     >
       <div className="flex gap-2">
-        <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Jenis olahraga baru" className={inputClass} />
-        <button disabled={busy} className={buttonClass}>
-          Tambah
-        </button>
+        <Input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Jenis olahraga baru" aria-label="Jenis olahraga baru" />
+        <Button disabled={busy}>Tambah</Button>
       </div>
       <Feedback error={error} ok={ok} />
     </form>
@@ -74,10 +71,8 @@ export function ServiceFeeForm({ initial }: { initial: number }) {
       }}
     >
       <div className="flex gap-2">
-        <input type="number" min={0} step={1} required value={value} onChange={(e) => setValue(e.target.value)} className={inputClass} />
-        <button disabled={busy} className={buttonClass}>
-          Simpan
-        </button>
+        <Input type="number" min={0} step={1} required value={value} onChange={(e) => setValue(e.target.value)} aria-label="Biaya layanan (Rp)" />
+        <Button disabled={busy}>Simpan</Button>
       </div>
       <Feedback error={error} ok={ok} />
     </form>

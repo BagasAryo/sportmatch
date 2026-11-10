@@ -2,6 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { rupiah } from "@/lib/format";
 
+type Stat = { label: string; value: number; href?: string; highlight?: boolean };
+
 export default async function AdminHome() {
   const supabase = await createClient();
 
@@ -26,34 +28,46 @@ export default async function AdminHome() {
 
   const revenue = (feeRows.data ?? []).reduce((sum, r) => sum + (r.service_fee as number), 0);
 
-  const stats = [
-    { label: "Pengguna", value: users, href: "/admin/bookings" },
+  const stats: Stat[] = [
+    { label: "Pengguna", value: users },
     { label: "Pemilik venue", value: owners, href: "/admin/owners" },
-    { label: "Pengajuan pemilik menunggu", value: pendingOwners, href: "/admin/owners" },
+    { label: "Pengajuan pemilik menunggu", value: pendingOwners, href: "/admin/owners", highlight: pendingOwners > 0 },
     { label: "Venue", value: venues, href: "/admin/venues" },
     { label: "Booking dikonfirmasi", value: confirmed, href: "/admin/bookings" },
-    { label: "Menunggu verifikasi", value: pendingVerify, href: "/admin/bookings" },
+    { label: "Menunggu verifikasi pemilik", value: pendingVerify, href: "/admin/bookings" },
   ];
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-800">Ringkasan</h1>
 
-      <div className="mt-5 rounded-lg border border-brand-100 bg-brand-50 p-5">
-        <p className="text-sm text-brand-700">Pendapatan platform</p>
-        <p className="mt-1 text-3xl font-bold text-brand-700">{rupiah(revenue)}</p>
-        <p className="mt-1 text-xs text-slate-600">Jumlah biaya layanan dari booking yang sudah dikonfirmasi.</p>
+      <div className="mt-5 rounded-xl bg-brand-600 p-6 text-white shadow-sm">
+        <p className="text-sm text-brand-100">Pendapatan platform</p>
+        <p className="mt-1 text-3xl font-bold">{rupiah(revenue)}</p>
+        <p className="mt-1 text-xs text-brand-100">Jumlah biaya layanan dari booking yang sudah dikonfirmasi.</p>
       </div>
 
       <ul className="mt-5 grid gap-4 sm:grid-cols-3">
-        {stats.map((s) => (
-          <li key={s.label}>
-            <Link href={s.href} className="block rounded-lg border bg-white p-4 hover:border-brand-600">
+        {stats.map((s) => {
+          const cls = `block rounded-xl border p-4 shadow-sm ${s.highlight ? "border-accent-500 bg-accent-50" : "bg-white"} ${s.href ? "hover:border-brand-600" : ""}`;
+          const body = (
+            <>
               <p className="text-sm text-slate-600">{s.label}</p>
-              <p className="mt-1 text-2xl font-bold text-slate-800">{s.value}</p>
-            </Link>
-          </li>
-        ))}
+              <p className={`mt-1 text-2xl font-bold ${s.highlight ? "text-accent-600" : "text-slate-800"}`}>{s.value}</p>
+            </>
+          );
+          return (
+            <li key={s.label}>
+              {s.href ? (
+                <Link href={s.href} className={cls}>
+                  {body}
+                </Link>
+              ) : (
+                <div className={cls}>{body}</div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

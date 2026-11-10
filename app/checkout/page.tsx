@@ -8,6 +8,9 @@ import SiteFooter from "@/components/site-footer";
 import ProblemPage from "@/components/problem-page";
 import Notice from "@/components/ui/notice";
 import Button from "@/components/ui/button";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Konfirmasi Booking" };
 
 const hourOf = (t: string) => parseInt(t.slice(0, 2), 10);
 

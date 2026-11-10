@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
@@ -5,6 +6,13 @@ import Availability, { type CourtInfo } from "@/components/availability";
 import { createClient } from "@/lib/supabase/server";
 import { first } from "@/lib/utils";
 import Link from "next/link";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase.from("venues").select("name").eq("id", id).maybeSingle();
+  return { title: data?.name ?? "Venue" };
+}
 
 export default async function VenueDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ date?: string; start?: string; end?: string; sport?: string }> }) {
   const { id } = await params;
@@ -47,9 +55,9 @@ export default async function VenueDetailPage({ params, searchParams }: { params
   const canBook = !!venue.qris_image_url && courts.length > 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50">
       <SiteHeader />
-      <main className="mx-auto max-w-5xl px-4 py-6">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         {photos.length > 0 ? (
           <div className="grid gap-2 sm:grid-cols-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -71,7 +79,13 @@ export default async function VenueDetailPage({ params, searchParams }: { params
         </div>
         <p className="mt-1 text-slate-600">{venue.address}</p>
         <p className="mt-1 text-sm text-slate-600">
-          {rating?.avg_rating ? `★ ${rating.avg_rating} (${rating.review_count} ulasan)` : "Belum ada ulasan"}
+          {rating?.avg_rating ? (
+            <>
+              <span className="text-accent-500">★</span> {rating.avg_rating} ({rating.review_count} ulasan)
+            </>
+          ) : (
+            "Belum ada ulasan"
+          )}
           {venue.maps_url && (
             <>
               {" "}
@@ -106,7 +120,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
             </p>
           )}
           {courts.length === 0 ? (
-            <p className="rounded border border-dashed bg-white p-6 text-center text-slate-500">Venue ini belum memiliki lapangan aktif.</p>
+            <p className="rounded-xl border border-dashed bg-white p-6 text-center text-slate-500">Venue ini belum memiliki lapangan aktif.</p>
           ) : (
             <Availability courts={courts} defaultDate={date} defaultStart={start} defaultEnd={end} canBook={canBook} />
           )}
@@ -119,7 +133,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
           ) : (
             <ul className="space-y-3">
               {reviews.map((r) => (
-                <li key={r.id} className="rounded-xl border bg-white p-4">
+                <li key={r.id} className="rounded-xl border bg-white p-4 shadow-sm">
                   <p className="font-medium text-accent-600">
                     {"★".repeat(r.rating)}
                     <span className="text-slate-300">{"★".repeat(5 - r.rating)}</span>
@@ -138,24 +152,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
           )}
         </section>
       </main>
-      <p className="mt-1 text-sm text-slate-600">
-        {rating?.avg_rating ? (
-          <>
-            <span className="text-accent-500">★</span> {rating.avg_rating} ({rating.review_count} ulasan)
-          </>
-        ) : (
-          "Belum ada ulasan"
-        )}
-        {venue.maps_url && (
-          <>
-            {" "}
-            &middot;{" "}
-            <a href={venue.maps_url} target="_blank" rel="noopener noreferrer" className="text-brand-600 underline">
-              Lihat di Google Maps
-            </a>
-          </>
-        )}
-      </p>
+      <SiteFooter />
     </div>
   );
 }

@@ -15,17 +15,17 @@ export default async function AdminBookingsPage() {
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-slate-800">Booking</h1>
-      <p className="mt-1 text-sm text-slate-600">100 booking terbaru dari seluruh venue.</p>
+      <p className="mt-1 text-sm text-slate-600">100 booking terbaru dari seluruh venue. Verifikasi pembayaran dilakukan oleh pemilik venue masing-masing.</p>
 
       {!bookings || bookings.length === 0 ? (
-        <p className="mt-6 rounded border border-dashed bg-white p-8 text-center text-slate-500">Belum ada booking.</p>
+        <div className="mt-6 rounded-xl border border-dashed bg-white p-8 text-center text-slate-500">Belum ada booking.</div>
       ) : (
         <ul className="mt-6 space-y-3">
           {bookings.map((b) => {
             const court = first(b.courts);
             const venue = first(court?.venues);
             return (
-              <li key={b.id} className="rounded-lg border bg-white p-4">
+              <li key={b.id} className="rounded-xl border bg-white p-4 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <p className="font-semibold text-slate-800">

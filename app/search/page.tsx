@@ -5,6 +5,9 @@ import Notice from "@/components/ui/notice";
 import SearchResults, { type SearchResult } from "@/components/search-results";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateID, todayWIB } from "@/lib/format";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Cari Venue" };
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const { sport, date, start, end } = await searchParams;

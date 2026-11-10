@@ -44,7 +44,7 @@ export default async function DashboardShell({ role, children }: { role: "owner"
           <div className="flex items-center gap-3">
             {/* Notifikasi tidak pernah dikirim ke admin */}
             {profile && profile.role !== "admin" && <NotificationBellLoader userId={profile.id} />}
-            {profile && <UserMenu name={profile.full_name} roleLabel={ROLE_LABEL[profile.role]} items={[dashboard, { href: "/profile", label: "Edit profil" }, { href: "/", label: "Lihat beranda pengguna" }]} />}
+            {profile && <UserMenu name={profile.full_name} roleLabel={ROLE_LABEL[profile.role]} items={[dashboard, { href: "/profile", label: "Edit profil" }]} />}
           </div>
         </div>
         <div className="border-b">

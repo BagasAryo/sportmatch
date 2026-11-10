@@ -4,6 +4,9 @@ import AuthShell from "@/components/auth-shell";
 import Button from "@/components/ui/button";
 import Field from "@/components/ui/field";
 import Input from "@/components/ui/input";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Masuk" };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
   const { error, next } = await searchParams;

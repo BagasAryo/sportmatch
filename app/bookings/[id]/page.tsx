@@ -10,6 +10,9 @@ import PaymentActions from "./payment-actions";
 import PaymentCountdown from "./payment-countdown";
 import ReviewForm from "@/components/review-form";
 import Notice from "@/components/ui/notice";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Detail Booking" };
 
 export default async function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

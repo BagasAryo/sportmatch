@@ -3,6 +3,9 @@ import SiteFooter from "@/components/site-footer";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
 import NotificationList from "./notification-list";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Notifikasi" };
 
 export default async function NotificationsPage() {
   const supabase = await createClient();
